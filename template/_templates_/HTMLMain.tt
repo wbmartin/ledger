@@ -1,0 +1,22 @@
+[%- FILTER redirect("/index.html") -%]
+<!DOCType html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+[%INCLUDE app/xHeader/_headerWeb.html%]
+<body> 
+[%- # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -%]
+[%FOREACH tPath = appTemplates%]
+<!--[%tPath%] -->
+  [%-IF  tPath.match('Web')-%]
+	  [%-IF tPath.match('js'); NEXT; END;-%]
+	  [%-IF tPath.match('\/x'); NEXT; END;-%]
+		<!-- From: [%tPath%] -->
+		[%INCLUDE $tPath%]
+	[%-END-%]
+[%-END-%]
+[%- # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-%]
+[%-#INCLUDE app/LoginPortal/_loginPortalWeb.html-%]
+[%-#INCLUDE app/Footer/_footerWeb.html-%]
+[%-#INCLUDE app/Footer/_footerCommon.html-%]
+</body>
+</html>
+[%- END #filter -%]

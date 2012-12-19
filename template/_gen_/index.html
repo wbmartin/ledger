@@ -1,0 +1,71 @@
+<!DOCType html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<!--BUILDONLY_BEGIN-->
+	<script src="../closure-library/closure/goog/base.js"></script>
+	<script src="app.js"></script>
+	<script type="text/javascript">
+		goog.require('goog.dom');
+		goog.require('goog.net.XhrIo');
+		</script>
+	<!--BUILDONLY_END-->
+	
+		<style type="text/css">
+			
+			
+		</style>
+	</head>
+<body> 
+<!--./template/_templates_/app/login/_loginCommon.html -->
+<!--./template/_templates_/app/login/_loginCommon.js -->
+<!--./template/_templates_/app/login/_loginWeb.js -->
+<!--./template/_templates_/app/login/_loginMobile.js -->
+<!--./template/_templates_/app/login/_loginMobile.html -->
+<!--./template/_templates_/app/login/_loginWeb.html -->		<!-- From: ./template/_templates_/app/login/_loginWeb.html -->
+		<!--Begin LoginPortal-->
+<div id="Login" class="displayOnLoad">
+<form id="LoginForm" action="">
+				<div class="formLayout_Standard prettyWrapper" style="width:30em;">
+					<h1>Login</h1>
+					<span class="small" >Please enter your login credentials</span><hr/>
+					
+					
+					
+					<div class="formFieldGroup" id="LoginForm-user_idDivId">
+						<label for ="LoginForm-user_id" style="display:inline-block;width:7em;" id="LoginFormLabel-user_id">User ID</label>
+						<input type="text" style="width:15em" name="user_id" id="LoginForm-user_id" class="VALIDATErequired"/>	 
+						<span class="ValidationMsg" style="width:0em" id="LoginFormLabel-userIdError"></span>
+					</div>
+					
+					<div class="formFieldGroup" id="LoginForm-passwordDivId">
+						<label for ="LoginForm-password" style="display:inline-block;width:7em;" id="LoginFormLabel-password">Password</label>
+						<input type="password" style="width:15em" name="password" id="LoginForm-password" class="VALIDATErequired"/>	 
+						<span class="ValidationMsg" style="width:0em" id="LoginFormLabel-passwordError"></span>
+					</div>
+					
+					<div class="text/cssformFieldGroup" id="LoginForm-password_reset_codeDivId" style="display:none">
+						text/css<label for ="LoginForm-password_reset_code" style="display:inline-block;width:7em;" id="LoginFormLabel-password_reset_code">Reset Code</label>
+						text/css<input type="text" style="width:15em" name="password_reset_code" id="LoginForm-password_reset_code" class=""/>	 
+						<span class="ValidationMsg" style="width:0em" id="LoginFormLabel-passwordResetCodeError"></span>
+					</div>
+					<div class="formButtons">
+						<button type="button" id="cmdlogin" class="" onclick="loginCall('authenticate')" > <span class="">Login</span> </button> 
+						<button type="button" id="cmdOneTimelogin" class=" " style="display:none;" onclick="loginCall('one_time')" ><span class=""> One Time Login</span> </button> 
+					</div>
+					<label for="trustedDeviceId" style="display:inline-block;">Trusted Device:</label>
+					<input type="checkbox" id="trustedDeviceId"/>
+				</div> 
+			</form> 
+			<a href="#" onclick="start()">test</a>
+</div>
+<!--./template/_templates_/app/xStyle/mainCommon.css -->
+<!--./template/_templates_/app/xStyle/mainWeb.css -->
+<!--./template/_templates_/app/xStyle/mainMobile.css -->
+<!--./template/_templates_/app/xStyle/less.css -->
+<!--./template/_templates_/app/xHeader/_headerWeb.html -->
+<!--./template/_templates_/app/xHeader/_headerMobile.html -->
+<!--./template/_templates_/app/lib/libMobile.js -->
+<!--./template/_templates_/app/lib/libCommon.js -->
+<!--./template/_templates_/app/lib/libWeb.js --></body>
+</html>
