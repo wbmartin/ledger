@@ -1,15 +1,18 @@
 #!/bin/bash
-rm -f deploy/*.html
-rm -f deploy/*.js
+rm -rf deploy/*
 cp build/app/index.html deploy
+mkdir deploy/cgi-bin
+cp build/app/cgi-bin/server.pl deploy/cgi-bin/
+cp build/app/cgi-bin/UTL.pm deploy/cgi-bin/
+
 perl -i -pe 'BEGIN{undef $/;} s/<\!--BUILDONLY_BEGIN.*END-->/<script type="text\/javascript" src="app-compiled.js"><\/script>/smg' deploy/index.html
 build/closure-library/closure/bin/build/closurebuilder.py \
 	--root=build/closure-library/ \
 	--root=build/app/ \
-	--namespace="app.start" \
+	--namespace="app" \
 	--output_mode=compiled \
 	--compiler_jar=/home/wbmartin/dev/closurecompiler/compiler.jar \
 	--compiler_flags="--compilation_level=ADVANCED_OPTIMIZATIONS" \
+	--compiler_flags="--debug" \
+	--compiler_flags="--formatting=pretty_print" \
 	> deploy/app-compiled.js
-
-#<script src="app-compiled.js"></script>

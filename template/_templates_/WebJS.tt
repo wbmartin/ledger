@@ -1,6 +1,9 @@
 [%- FILTER redirect('/app.js') -%]
 [%- serverErrorMsg_Communication ='Sorry, there was a problem communicating with the server.' -%]
 'use strict';
+goog.require('goog.dom');
+goog.require('goog.net.XhrIo');
+
 [% # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -%]
 [%FOREACH tPath = appTemplates%]
   [%-IF  tPath.match('Web') or tPath.match('Common')-%]

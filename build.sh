@@ -1,7 +1,7 @@
 #!/bin/bash
 clear
 srcpath="."
-./template/generateTemplates.pl $srcpath
+./generateTemplates.pl $srcpath
 outputPath="./template/_gen_"
 #Post Processing
 echo "replacing Tabs\n";

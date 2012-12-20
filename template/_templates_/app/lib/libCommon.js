@@ -1,16 +1,17 @@
-goog.provide('app.start');
+goog.provide('app');
 
-
-
-//app.start = function() {
 /**
- *@expose
 */
 function start() {
-	  //var newDiv = goog.dom.createDom('h1', {'style': 'background-color:#EEE'},
-		//		    'Hello world!');
-		//  goog.dom.appendChild(document.body, "<p>ok</p>");
-		alert ("ok");
+	alert ("ok");
+	var xhr = new goog.net.XhrIo();
+	goog.events.listen(xhr, goog.net.EventType.COMPLETE, function(e) {
+		var obj = this.getResponseJson();
+		alert (obj['rows'][0]['session_id']);
+	});
+	var qd = {'spwfResource':'SECURITY_USER','spwfAction':'AUTHENTICATE','user_id':'ledger','password':'ledger' }
+	xhr.send('./cgi-bin/server.pl','POST',goog.json.serialize(qd));
+
 };
 
 //prevent renaming 
