@@ -15,4 +15,5 @@ build/closure-library/closure/bin/build/closurebuilder.py \
 	--compiler_flags="--compilation_level=ADVANCED_OPTIMIZATIONS" \
 	--compiler_flags="--debug" \
 	--compiler_flags="--formatting=pretty_print" \
+	--compiler_flags="--warning_level=verbose" \
 	> deploy/app-compiled.js

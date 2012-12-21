@@ -14,9 +14,8 @@
 	[%-END-%]
 [%-END-%]
 [%- # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-%]
-[%-#INCLUDE app/LoginPortal/_loginPortalWeb.html-%]
-[%-#INCLUDE app/Footer/_footerWeb.html-%]
-[%-#INCLUDE app/Footer/_footerCommon.html-%]
+[%-INCLUDE app/xFooter/_footerWeb.html-%]
+[%-INCLUDE app/xFooter/_footerCommon.html-%]
 </body>
 </html>
 [%- END #filter -%]

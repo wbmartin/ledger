@@ -1,9 +1,14 @@
 [%- FILTER redirect('/app.js') -%]
 [%- serverErrorMsg_Communication ='Sorry, there was a problem communicating with the server.' -%]
 'use strict';
+goog.require('goog.Uri');
+goog.require('goog.debug.ErrorHandler');
 goog.require('goog.dom');
+goog.require('goog.dom.classes');
+goog.require('goog.dom.query');
+goog.require('goog.events.EventHandler');
 goog.require('goog.net.XhrIo');
-
+goog.require('goog.object');
 [% # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -%]
 [%FOREACH tPath = appTemplates%]
   [%-IF  tPath.match('Web') or tPath.match('Common')-%]
@@ -14,4 +19,5 @@ goog.require('goog.net.XhrIo');
 	[%-END-%]
 [%-END-%]
 [% # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-%]
+[%INCLUDE app/xFooter/_footerWeb.js%]
 [%- END #filter -%]

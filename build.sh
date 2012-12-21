@@ -7,15 +7,15 @@ outputPath="./template/_gen_"
 echo "replacing Tabs\n";
 perl -p -i -e 's/\t/ /g' $outputPath/app.js;
 #perl -p -i -e 's/\t/ /g' $outputPath/appmobile.js;
-#perl -p -i -e 's/\t/ /g' $outputPath/index.html;
+perl -p -i -e 's/\t/ /g' $outputPath/index.html;
 echo "replacing EOL whitespace\n";
-perl -p -i -e 's/[ \t]+\$//g' $outputPath/app.js;
+perl -p -i -e 's/[ \t]+$//g' $outputPath/app.js;
 #perl -p -i -e 's/[ \t]+\$//g' $outputPath/appmobile.js;
-perl -p -i -e 's/[ \t]+\$//g' $outputPath/index.html;
+perl -p -i -e 's/[ \t]+$//g' $outputPath/index.html;
 
 echo 'replacing redundant line breaks';
 perl -p -i -e 's/^\n//' $outputPath/index.html;
-perl -p -i -e 's/\n\n/\n/g' $outputPath/app.js;
+perl -p -i -e 's/\n\n/\n/smg' $outputPath/app.js;
 #perl -p -i -e 's/\n\n/\n/g' $outputPath/appmobile.js;
 echo 'removing redunant spaces in html';
 perl -p -i -e 's/ +/ /g' $outputPath/index.html;
