@@ -15,9 +15,9 @@ start.start = function() {
 		var obj = e.target.getResponseJson();
 		/** @type {string} */
 		var session = obj['rows'][0]['session_id'];
+		app.GLOBAL.SESSION_ID = session;
 		onSuccessfulLogin();
 		goog.net.cookies.set('session', session);
-		app.GLOBAL.SESSION_ID = session;
 	};
 	app.server.cmdCall(cmdParams, callBack);
 

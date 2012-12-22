@@ -12,9 +12,13 @@ app.GLOBAL.SESSION_ID = '';
 
 /** @type {goog.debug.Logger} */
 app.initLogger = function(){
+    app.debugWindow = new goog.debug.FancyWindow('main');
+    app.debugWindow.setEnabled(true);
+    app.debugWindow.init();
+
 app.logger = goog.debug.Logger.getLogger('app');
-app.loggerConsole = new goog.debug.DivConsole(goog.dom.getElement('AppLoggerDivId'));
-app.loggerConsole.setCapturing(true);
+//app.loggerConsole = new goog.debug.DivConsole(goog.dom.getElement('AppLoggerDivId'));
+//app.loggerConsole.setCapturing(true);
 app.logger.info('Initialized');
 }
 goog.exportSymbol('app.initLogger',app.initLogger);
@@ -108,9 +112,10 @@ goog.provide('app.utl');
 /**
  *
  * SRC: [%SRC_LOC%]
+ * @param {Object} er the digester.
  * @param {Object} ee the digestee.
  */
-Object.prototype.digest = function(ee) {
+app.Command.prototype.digest = function(ee) {
 	/** @type {string} */
 	var key;
 	for (key in ee) {
@@ -128,25 +133,30 @@ var testbreak = true;
  * Hide all other divs and show the new one.
  * @param {string} divToShow_  the div to show
  */
-app.standardShowPage = function(divToShow_) {
-	if (divToShow_ == '') {
-		divToShow_ ='Login';
+app.standardShowPage = function(event_) {
+	var divToShow = event_.token;
+	if (divToShow == '') {
+		divToShow ='Login';
 		app.GLOBAL.TARGET_PAGE = 'MainLauncher';
-	} else if(divToShow_.indexOf('-PENDING')>0){
+	} else if(divToShow.indexOf('-PENDING')>0){
 		//if there is a -PENDING it's a bogus request
-		return false;
+		if (event_.lastToken == null){
+			divToShow = divToShow.replace('-PENDING','');
+		} else {
+		  return false;
+		}
 	}
 	if(app.GLOBAL.SESSION_ID == ''){
 		app.GLOBAL.SESSION_ID = goog.net.cookies.get('session');
 		if (app.GLOBAL.SESSION_ID != ''){
 			//try to authenticate and call this function again
 		}
-		if(divToShow_ != 'Login'){
-			app.GLOBAL.TARGET_PAGE = divToShow_;
+		if(divToShow != 'Login'){
+			app.GLOBAL.TARGET_PAGE = divToShow;
 			app.hist.replaceToken(app.hist.getToken() + '-PENDING')
 		}
-		divToShow_ = 'Login';
-		app.currentDisplayDivs.push(divToShow_);
+		divToShow = 'Login';
+		app.currentDisplayDivs.push(divToShow);
 		return false;
 	}
 	/** @type {string} */
@@ -157,9 +167,9 @@ app.standardShowPage = function(divToShow_) {
 		element = goog.dom.getElement(visibleDiv + 'DivId');
 		goog.dom.classes.add(element, 'LogicalHide');
 	}
-	element = goog.dom.getElement((divToShow_ + 'DivId'));
+	element = goog.dom.getElement((divToShow + 'DivId'));
 	goog.dom.classes.remove(element, 'LogicalHide');
-	app.currentDisplayDivs.push(divToShow_);
+	app.currentDisplayDivs.push(divToShow);
 	//_gaq.push(['_trackPageview', divToShow_]);
 
 }
@@ -170,7 +180,7 @@ app.standardShowPage = function(divToShow_) {
  * @param {goog.events.Event} e the event.
  */ 
 app.navCallback = function(e){
-	app.standardShowPage (e.token);
+	app.standardShowPage (e);
 
 }
 /**
