@@ -1,5 +1,16 @@
+<form>
+	<input type="text" name="historyTrackerId" id = "historyTrackierId" style="display:none;" >
+</form>
 <!--BUILDONLY_BEGIN-->
-	<script src="../closure-library/closure/goog/base.js"></script>
-	<script src="app.js"></script>
-	<!--BUILDONLY_END-->
+<script type="text/javascript" src="../closure-library/closure/goog/base.js"></script>
+<script type="text/javascript" src="app.js"></script>
+<!--BUILDONLY_END-->
+<script type="text/javascript" >
+document.getElementById('LoginForm-user_id').value = 'ledger';
+document.getElementById('LoginForm-password').value = 'ledger';
+var h2 = app.initHistory();
+app.initLogger();
+</script>
 
+
+ 

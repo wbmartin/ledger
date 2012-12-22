@@ -2,8 +2,11 @@
 rm -rf deploy/*
 cp build/app/index.html deploy
 mkdir deploy/cgi-bin
+mkdir deploy/images
 cp build/app/cgi-bin/server.pl deploy/cgi-bin/
 cp build/app/cgi-bin/UTL.pm deploy/cgi-bin/
+cp build/app/images/* deploy/images/
+
 
 perl -i -pe 'BEGIN{undef $/;} s/<\!--BUILDONLY_BEGIN.*END-->/<script type="text\/javascript" src="app-compiled.js"><\/script>/smg' deploy/index.html
 build/closure-library/closure/bin/build/closurebuilder.py \

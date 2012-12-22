@@ -1,7 +1,8 @@
 [%divId="Login"%]
+[% SRC_LOC = '_loginWeb'%]
 goog.provide('start');
 /**
- *
+ *  SRC: [% SRC_LOC%]
  */ 
 start.start = function() {
 	/** @type {app.Command} */
@@ -12,20 +13,21 @@ start.start = function() {
 	callBack = function(e) {
 		/** @type {Object} */
 		var obj = e.target.getResponseJson();
+		/** @type {string} */
+		var session = obj['rows'][0]['session_id'];
 		onSuccessfulLogin();
-		alert(obj['rows'][0]['session_id']);
+		goog.net.cookies.set('session', session);
+		app.GLOBAL.SESSION_ID = session;
 	};
 	app.server.cmdCall(cmdParams, callBack);
 
 };
 goog.exportSymbol('start.start', start.start);
 
-function onSuccessfulLogin(){
-	/** @type {goog.dom.getElement} */
-var element = goog.dom.getElement('Login');
-  goog.dom.classes.add(element, 'LogicDisabled');
-	element = goog.dom.getElement('Launcher');
-  goog.dom.classes.remove(element, 'LogicDisabled');
-	
 
+/**
+ *  SRC: [% SRC_LOC%]
+ */ 
+function onSuccessfulLogin(){
+	app.hist.setToken(app.GLOBAL.TARGET_PAGE);
 }

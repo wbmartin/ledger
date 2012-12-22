@@ -2,6 +2,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
  <meta charset="utf-8"/>
+ <script type="text/javascript">
+ var _gaq = _gaq || [];
+ _gaq.push(['_setAccount', 'UA-37053410-1']);
+ _gaq.push(['_setDomainName', 'martinanalytics.com']);
+ _gaq.push(['_trackPageview','InitialLoad']);
+ (function() {
+ var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+ var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+ })();
+</script>
  <style type="text/css">
  /* CSS Resets */
 html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,address,cite,code,del,dfn,em,img,ins,q,small,strong,sub,sup,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{border:0;margin:0;padding:0}article,aside,figure,figure img,figcaption,hgroup,footer,header,nav,section,video,object{display:block}a img{border:0}figure{position:relative}figure img{width:100%}
@@ -99,6 +110,85 @@ img {
  padding-left: 20px;
  padding-right: 20px;
  }
+}
+ .SecurityDisabled{
+ display:none !important;
+}
+.LogicDisabled{
+display:none !important;
+}
+.LogicalHide{
+display:none !important;
+}
+.largeIconSpan{
+ display:inline-block;
+ border-style:none;
+ text-align:center;
+ padding:15px;
+ margin:15px;
+}
+.sprite64Icon{
+ display:inline-block;
+ height:64px;
+ width:64px;
+ background:url(images/consolidatedIcons.png) no-repeat;
+ padding: 0 0 0 0;
+}
+.sprite32Icon{
+ display:inline-block;
+ height:32px;
+ width:32px;
+ background:url(images/consolidatedIcons.png) no-repeat;
+ padding: 0 0 0 0;
+}
+.sprite16Icon{
+ display:inline-block;
+ height:16px;
+ width:16px;
+ background:url(images/consolidatedIcons.png) no-repeat;
+ padding: 0 0 0 0;
+}
+.peopleIcon{
+ background-position:0px -100px;
+}
+.learnMoreIcon{
+ background-position:0px -200px;
+}
+.helpIcon{
+ background-position:0px -300px;
+}
+.keyIcon{
+ background-position:0px -400px;
+}
+.keyManIcon{
+ background-position:0px -500px;
+}
+.plusIcon{
+ background-position:0px -268px;
+}
+.cancelIcon{
+ background-position:-32px -268px;
+}
+.logIcon{
+ background-position:0px -575px;
+}
+.lightningFolderIcon{
+ background-position:0px -650px;
+}
+.lockIcon{
+ background-position:0px -725px;
+}
+.askForHelpIcon{
+background-position:0px -800px;
+}
+.remoteIcon{
+background-position:0px -875px;
+}
+.smallPlusIcon{
+background-position:0px -180px;
+}
+.smallCancelIcon{
+background-position:-20px -180px;
 }
  /* --------------------------------------------------------------
 http://www.blueprintcss.org/
@@ -331,7 +421,7 @@ form.inline p { margin-bottom:0; }
 <!--./template/_templates_/app/login/_loginMobile.html -->
 <!--./template/_templates_/app/login/_loginWeb.html --> <!-- From: ./template/_templates_/app/login/_loginWeb.html -->
  <!--Begin LoginPortal-->
-<div id="Login" class="displayOnLoad">
+<div id="LoginDivId" class="displayOnLoad">
  <form id="LoginForm" action="">
  <div class="formLayout_Standard prettyWrapper" style="width:30em;">
  <h1>Login</h1>
@@ -359,12 +449,43 @@ form.inline p { margin-bottom:0; }
  <input type="checkbox" id="LoginForm-trustedDeviceId"/>
  </div>
  </form>
- <a href="#" onclick="start.start()">test</a>
+ <a href="" onclick="start.start(); return false;">test</a>
 </div>
 <!--./template/_templates_/app/xStyle/mainCommon.css -->
 <!--./template/_templates_/app/xStyle/mainWeb.css -->
 <!--./template/_templates_/app/xStyle/mainMobile.css -->
 <!--./template/_templates_/app/xStyle/1140.css -->
+<!--./template/_templates_/app/mainLauncher/_mainLauncherCommon.html -->
+<!--./template/_templates_/app/mainLauncher/_mainLauncherMobile.html -->
+<!--./template/_templates_/app/mainLauncher/_mainLauncherWeb.html --> <!-- From: ./template/_templates_/app/mainLauncher/_mainLauncherWeb.html -->
+<div id="MainLauncherDivId" class="LogicalHide">
+ <div id ="MainLauncherCenterDiv" >
+ <div class="row">
+ <h1 id="MainLauncherTitle" class="pageTitle" >I want to&hellip;</h1>
+ </div>
+ <div class="row">
+ <div class="twocol largeIconSpan" id="launcherShowGetHelpSpanId"><a id="launcherShowHelp" onclick="changePage(function(){showHelpPane()});">
+ <span class="sprite64Icon helpIcon">&nbsp;</span><br/>
+ Get Help</a>
+ </div>
+ <div class="twocol largeIconSpan" id="launcherShowAccessGroupsSpanId"><a id="launcherShowSecurityAccessGroups" onclick="changePage(function(){showSecurityAccessGroups()});">
+ <span class="sprite64Icon keyIcon">&nbsp;</span><br/>
+ Access Groups</a>
+ </div>
+ <div class="twocol last largeIconSpan" id="launcherShowSecurityUserSpanId"><a id="launcherShowSecurityUserId" onclick="changePage(function(){showSecurityUser()});">
+ <span class="sprite64Icon keyManIcon">&nbsp;</span><br/>
+ Application Users</a>
+ </div>
+ <div class="twocol last largeIconSpan" id="launcherShowChangeOwnPasswordSpanId"><a id="launcherShowChangePassword" onclick="changePage(function(){showChangePasswordDialog()});">
+ <span class="sprite64Icon lockIcon">&nbsp;</span><br/>
+ Change My Password</a>
+ </div>
+ </div>
+ </div>
+</div>
+<!--./template/_templates_/app/mainLauncher/_mainLauncherWeb.js -->
+<!--./template/_templates_/app/mainLauncher/_mainLauncherCommon.js -->
+<!--./template/_templates_/app/mainLauncher/_mainLauncherMobile.js -->
 <!--./template/_templates_/app/xFooter/_footerWeb.js -->
 <!--./template/_templates_/app/xFooter/_footerCommon.js -->
 <!--./template/_templates_/app/xFooter/_footerMobile.js -->
@@ -375,6 +496,14 @@ form.inline p { margin-bottom:0; }
 <!--./template/_templates_/app/xHeader/_headerMobile.html -->
 <!--./template/_templates_/app/lib/libMobile.js -->
 <!--./template/_templates_/app/lib/libCommon.js -->
-<!--./template/_templates_/app/lib/libWeb.js --><script type="text/javascript" src="app-compiled.js"></script>
+<!--./template/_templates_/app/lib/libWeb.js --><form>
+ <input type="text" name="historyTrackerId" id = "historyTrackierId" style="display:none;" >
+</form>
+<script type="text/javascript" src="app-compiled.js"></script>
+<script type="text/javascript" >
+document.getElementById('LoginForm-user_id').value = 'ledger';
+document.getElementById('LoginForm-password').value = 'ledger';
+var h2 = app.initHistory();
+</script>
 </body>
 </html>

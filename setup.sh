@@ -8,6 +8,7 @@ mkdir template/_template_/xHeader/
 mkdir build
 mkdir build/app/
 mkdir build/app/cgi-bin
+mkdir build/app/images
 svn checkout http://closure-library.googlecode.com/svn/trunk/ build/closure-library
 
 mkdir deploy

@@ -1,5 +1,8 @@
-	/** @type {app.log} */
-var mainLog = new app.log();
-mainLog.addEntry(new app.logEntry('Log Initialized'));
-document.getElementById('LoginForm-user_id').value = 'ledger';
-document.getElementById('LoginForm-password').value = 'ledger';
+//app.init = function(){
+//	app.mainLog= new app.log();
+//	app.mainLog.addEntry(new app.logEntry('Log Initialized'));
+//}
+//app.init();
+
+
+

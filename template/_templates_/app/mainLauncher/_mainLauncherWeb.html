@@ -1,0 +1,29 @@
+[%divId ='MainLauncher'%]
+<div id="[%divId%]DivId" class="LogicalHide">
+	<div id ="[%divId%]CenterDiv" >
+		[%#style="position:relative;width:300; height: 500; margin-left:auto; margin-right:auto; max-width:300; " %]
+		<div class="row">
+			<h1 id="[%divId%]Title" class="pageTitle" >I want to&hellip;</h1>
+		</div>
+		<div class="row"> 
+			<div class="twocol largeIconSpan" id="launcherShowGetHelpSpanId"><a id="launcherShowHelp" onclick="showAppLogger();">
+					<span class="sprite64Icon helpIcon">&nbsp;</span><br/>
+					Get Help</a>
+			</div>
+
+			<div class="twocol largeIconSpan" id="launcherShowAccessGroupsSpanId"><a id="launcherShowSecurityAccessGroups" onclick="changePage(function(){showSecurityAccessGroups()});">
+					<span class="sprite64Icon keyIcon">&nbsp;</span><br/>
+					Access Groups</a>
+			</div>
+			<div class="twocol last largeIconSpan" id="launcherShowSecurityUserSpanId"><a id="launcherShowSecurityUserId" onclick="changePage(function(){showSecurityUser()});">
+					<span class="sprite64Icon keyManIcon">&nbsp;</span><br/>
+					Application Users</a>
+			</div>
+			<div class="twocol last largeIconSpan" id="launcherShowChangeOwnPasswordSpanId"><a id="launcherShowChangePassword" onclick="changePage(function(){showChangePasswordDialog()});">
+					<span class="sprite64Icon lockIcon">&nbsp;</span><br/>
+					Change My Password</a>
+			</div>
+		</div>
+	</div>
+</div>
+
