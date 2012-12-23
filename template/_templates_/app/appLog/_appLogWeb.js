@@ -1,7 +1,12 @@
 [%divId="AppLogger"%]
-function show[%divId%](){
-/** @type {Element} */
-	//var element = goog.dom.getElement('[%divId%]DivId');
-	//goog.dom.classes.remove(element, 'LogicalHide');
+[%SRC_LOC = 'appLogWeb.js'%]
+/*
+ * SRC: [%SRC_LOC%]
+ *
+ */
+
+function show[%divId%]() {
+	app.hist.setToken('[%divId%]');
+	   
 	}
-goog.exportSymbol('show[%divId%]',show[%divId%]);
+goog.exportSymbol('show[%divId%]', show[%divId%]);

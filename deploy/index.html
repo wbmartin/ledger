@@ -449,7 +449,19 @@ form.inline p { margin-bottom:0; }
  <input type="checkbox" id="LoginForm-trustedDeviceId"/>
  </div>
  </form>
- <a href="" onclick="start.start(); return false;">test</a>
+ <a href="" onclick="LoginWeb.start(); return false;">test</a>
+</div>
+<!--./template/_templates_/app/appLog/_appLogMobile.html -->
+<!--./template/_templates_/app/appLog/_appLogMobile.js -->
+<!--./template/_templates_/app/appLog/_appLogCommon.js -->
+<!--./template/_templates_/app/appLog/_appLogWeb.js -->
+<!--./template/_templates_/app/appLog/_appLogCommon.html -->
+<!--./template/_templates_/app/appLog/_appLogWeb.html --> <!-- From: ./template/_templates_/app/appLog/_appLogWeb.html -->
+<div id="AppLoggerDivId" class="LogicalHide">
+ <fieldset class="goog-debug-panel">
+ <legend>Event Log</legend>
+ <div id="loggerConsole"></div>
+ </fieldset>
 </div>
 <!--./template/_templates_/app/xStyle/mainCommon.css -->
 <!--./template/_templates_/app/xStyle/mainWeb.css -->
@@ -464,7 +476,7 @@ form.inline p { margin-bottom:0; }
  <h1 id="MainLauncherTitle" class="pageTitle" >I want to&hellip;</h1>
  </div>
  <div class="row">
- <div class="twocol largeIconSpan" id="launcherShowGetHelpSpanId"><a id="launcherShowHelp" onclick="changePage(function(){showHelpPane()});">
+ <div class="twocol largeIconSpan" id="launcherShowGetHelpSpanId"><a id="launcherShowHelp" onclick="showAppLogger();">
  <span class="sprite64Icon helpIcon">&nbsp;</span><br/>
  Get Help</a>
  </div>
@@ -495,7 +507,7 @@ form.inline p { margin-bottom:0; }
 <!--./template/_templates_/app/xHeader/_headerWeb.html -->
 <!--./template/_templates_/app/xHeader/_headerMobile.html -->
 <!--./template/_templates_/app/lib/libMobile.js -->
-<!--./template/_templates_/app/lib/libCommon.js -->
+<!--./template/_templates_/app/lib/_libCommon.js -->
 <!--./template/_templates_/app/lib/libWeb.js --><form>
  <input type="text" name="historyTrackerId" id = "historyTrackierId" style="display:none;" >
 </form>
@@ -503,7 +515,9 @@ form.inline p { margin-bottom:0; }
 <script type="text/javascript" >
 document.getElementById('LoginForm-user_id').value = 'ledger';
 document.getElementById('LoginForm-password').value = 'ledger';
-var h2 = app.initHistory();
+app.initLogger();
+LoginWeb.init();
+app.initHistory();
 </script>
 </body>
 </html>

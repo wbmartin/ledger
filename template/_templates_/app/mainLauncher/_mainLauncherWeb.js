@@ -1,5 +1,5 @@
 [%divId="MainLauncher"%]
-[%SRC_LOC="_launcherWeb.js"%]
+[%SRC_LOC="_mainLauncherWeb.js"%]
 
 goog.provide('[%divId%]');
 /**
@@ -9,4 +9,4 @@ goog.provide('[%divId%]');
 [%divId%].show = function() {
   //app.standardShowPage('[%divId%]');
 	app.hist.setToken('[%divId%]');
-}
+};

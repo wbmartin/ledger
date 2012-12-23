@@ -1,79 +1,105 @@
 'use strict';
+
+goog.require('goog.History');
 goog.require('goog.Uri');
-goog.require('goog.debug.ErrorHandler');
 goog.require('goog.debug');
-//goog.require('goog.debug.DivConsole');
-goog.require('goog.debug.Logger');
+goog.require('goog.debug.DivConsole');
+goog.require('goog.debug.ErrorHandler');
 goog.require('goog.debug.FancyWindow');
+goog.require('goog.debug.Logger');
 goog.require('goog.dom');
 goog.require('goog.dom.classes');
 goog.require('goog.dom.query');
 goog.require('goog.events');
 goog.require('goog.events.EventHandler');
-goog.require('goog.History');
 goog.require('goog.history.EventType');
-goog.require('goog.net.cookies');
 goog.require('goog.net.XhrIo');
+goog.require('goog.net.cookies');
 goog.require('goog.object');
 goog.require('goog.string');
 
 
 
 
-goog.provide('start');
+
+goog.provide('LoginWeb');
+
+/**
+ *
+ *
+ */
+LoginWeb.init = function() {
+ LoginWeb.logger = goog.debug.Logger.getLogger('Login');
+ LoginWeb.logger.info('Initialized');
+ LoginWeb.logger.setLevel(goog.debug.Logger.Level.ALL);
+};
+goog.exportSymbol('LoginWeb.init', LoginWeb.init);
 /**
  *  SRC: _loginWeb
  */
-start.start = function() {
+LoginWeb.start = function() {
+ LoginWeb.logger.finest('Call start');
  /** @type {app.Command} */
  var cmdParams = new app.Command('SECURITY_USER', 'AUTHENTICATE');
  cmdParams.digest(app.form.getValues('LoginForm'));
  /** @type {function({goog.events.Event})} */
  var callBack;
  callBack = function(e) {
+  LoginWeb.logger.finest('CallBack: Login Request ');
   /** @type {Object} */
   var obj = e.target.getResponseJson();
-  /** @type {string} */
   var session = obj['rows'][0]['session_id'];
-  app.GLOBAL.SESSION_ID = session;
-  onSuccessfulLogin();
-  goog.net.cookies.set('session', session);
+  LoginWeb.onSuccessfulLogin(session);
  };
  app.server.cmdCall(cmdParams, callBack);
 
 };
-goog.exportSymbol('start.start', start.start);
+goog.exportSymbol('LoginWeb.start', LoginWeb.start);
 
 
 /**
  *  SRC: _loginWeb
+ * @param {string} session_ the sessionID.
  */
-function onSuccessfulLogin(){
- app.hist.setToken(app.GLOBAL.TARGET_PAGE);
-}
+LoginWeb.onSuccessfulLogin = function(session_) {
+ LoginWeb.logger.finest('Call onSuccessfulLogin');
+ app.standardSuccessfulLogin(session_);
+
+};
+
+/**
+ *
+ *
+ *
+ */
 
 
 
-function showAppLogger(){
-/** @type {Element} */
- //var element = goog.dom.getElement('AppLoggerDivId');
- //goog.dom.classes.remove(element, 'LogicalHide');
+
+
+/*
+ * SRC: appLogWeb.js
+ *
+ */
+
+function showAppLogger() {
+ app.hist.setToken('AppLogger');
+
  }
-goog.exportSymbol('showAppLogger',showAppLogger);
+goog.exportSymbol('showAppLogger', showAppLogger);
 
 
 
 
 goog.provide('MainLauncher');
 /**
- * SRC: _launcherWeb.js
+ * SRC: _mainLauncherWeb.js
  *
  */
 MainLauncher.show = function() {
   //app.standardShowPage('MainLauncher');
  app.hist.setToken('MainLauncher');
-}
-
+};
 
 
 
@@ -87,30 +113,37 @@ goog.provide('app.GLOBAL');
 /** @type {string|undefined} */
 app.GLOBAL.SESSION_ID = '';
 
-/** @type {goog.debug.Logger} */
-app.initLogger = function(){
-    app.debugWindow = new goog.debug.FancyWindow('main');
-    app.debugWindow.setEnabled(true);
-    app.debugWindow.init();
+/**
+ *SRC:_libCommon.js
+ */
+app.initLogger = function() {
+ var logconsole =
+  new goog.debug.DivConsole(goog.dom.getElement('loggerConsole'));
+ logconsole.setCapturing(true);
+ app.logger = goog.debug.Logger.getLogger('app');
+ app.logger.info('Initialized');
 
-app.logger = goog.debug.Logger.getLogger('app');
-//app.loggerConsole = new goog.debug.DivConsole(goog.dom.getElement('AppLoggerDivId'));
-//app.loggerConsole.setCapturing(true);
-app.logger.info('Initialized');
-}
-goog.exportSymbol('app.initLogger',app.initLogger);
+
+
+ //app.debugWindow = new goog.debug.FancyWindow('main');
+ //    app.debugWindow.setEnabled(true);
+ //    app.debugWindow.init();
+
+};
+goog.exportSymbol('app.initLogger', app.initLogger);
 
 /**
  * target page after login unless changed later
  * @type string
  */
-app.GLOBAL.TARGET_PAGE ='MainLauncher';
+app.GLOBAL.TARGET_PAGE = 'MainLauncher';
 /**
  * SRC: _libCommon.js
  * @param {app.Command} cmdParams Parameters to construct the server side call.
  * @param {function({goog.events.Event})} completeCallBack function.
  */
 app.server.cmdCall = function(cmdParams, completeCallBack) {
+ app.logger.finest('Call: app.server.cmdCall ');
  /** @type {goog.net.XhrIo}*/
  var xhr = new goog.net.XhrIo();
  goog.events.listen(xhr, goog.net.EventType.COMPLETE, completeCallBack);
@@ -171,6 +204,7 @@ goog.provide('app.form.getValues');
  * @return {Object} form data.
  */
 app.form.getValues = function(formId_) {
+ app.logger.finest('Call: app.form.getValues - ' + formId_);
  /** @type {Object}*/
  var formValues = {};
  /** @type {{length: number}} */
@@ -189,7 +223,6 @@ goog.provide('app.utl');
 /**
  *
  * SRC: _libCommon.js
- * @param {Object} er the digester.
  * @param {Object} ee the digestee.
  */
 app.Command.prototype.digest = function(ee) {
@@ -204,33 +237,32 @@ app.Command.prototype.digest = function(ee) {
 app.currentDisplayDivs = new Array();
 
 goog.provide('app.standardShowPage');
-var testbreak = true;
 /**
  * SRC: _libCommon.js
  * Hide all other divs and show the new one.
- * @param {string} divToShow_  the div to show
+ * @param {goog.events.Event} event_  the div to show.
+ * @return {boolean} false if exiting early.
  */
 app.standardShowPage = function(event_) {
  var divToShow = event_.token;
  if (divToShow == '') {
-  divToShow ='Login';
+  divToShow = 'Login';
   app.GLOBAL.TARGET_PAGE = 'MainLauncher';
- } else if(divToShow.indexOf('-PENDING')>0){
+ } else if (divToShow.indexOf('-PENDING') > 0) {
   //if there is a -PENDING it's a bogus request
-  if (event_.lastToken == null){
-   divToShow = divToShow.replace('-PENDING','');
-  } else {
-    return false;
+  if (event_.lastToken == null) {
+   divToShow = divToShow.replace('-PENDING', '');
   }
+  return false;
  }
- if(app.GLOBAL.SESSION_ID == ''){
-  app.GLOBAL.SESSION_ID = goog.net.cookies.get('session');
-  if (app.GLOBAL.SESSION_ID != ''){
-   //try to authenticate and call this function again
+ if (app.GLOBAL.SESSION_ID == '') {
+  app.GLOBAL.SESSION_ID = goog.net.cookies.get('session_id');
+  if (app.GLOBAL.SESSION_ID != undefined) {
+   app.attemptCookieLogin();
   }
-  if(divToShow != 'Login'){
+  if (divToShow != 'Login') {
    app.GLOBAL.TARGET_PAGE = divToShow;
-   app.hist.replaceToken(app.hist.getToken() + '-PENDING')
+   app.hist.replaceToken(app.hist.getToken() + '-PENDING');
   }
   divToShow = 'Login';
   app.currentDisplayDivs.push(divToShow);
@@ -240,7 +272,7 @@ app.standardShowPage = function(event_) {
  var visibleDiv;
  /** @type {Element} */
  var element;
- while (visibleDiv =  app.currentDisplayDivs.pop()) {
+ while (visibleDiv = app.currentDisplayDivs.pop()) {
   element = goog.dom.getElement(visibleDiv + 'DivId');
   goog.dom.classes.add(element, 'LogicalHide');
  }
@@ -248,38 +280,94 @@ app.standardShowPage = function(event_) {
  goog.dom.classes.remove(element, 'LogicalHide');
  app.currentDisplayDivs.push(divToShow);
  //_gaq.push(['_trackPageview', divToShow_]);
-
-}
+  return true;
+};
 
 /**
  *
  * SRC: _libCommon.js
  * @param {goog.events.Event} e the event.
  */
-app.navCallback = function(e){
- app.standardShowPage (e);
+app.navCallback = function(e) {
+ app.standardShowPage(e);
 
-}
+};
 /**
  *
- * This is a very delicate function.  The call must come from a body script before the page finishes loading
+ * This is a very delicate function.
+ * The call must come from a body script before the page finishes loading
  * If there is every problems with navigation, it is probably here.
  * SRC: _libCommon.js
- * @return {goog.History} the history object;
+ * @return {goog.History} the history object.
  */
-app.initHistory = function(){
+app.initHistory = function() {
  /**
   *This input is located in _footerWeb.html
   * @type {HTMLInputElement} */
  var trackingElement = /** @type {HTMLInputElement} */
   (goog.dom.getElement('historyTrackerId'));
- app.hist = new goog.History(false, undefined,trackingElement);
+ app.hist = new goog.History(false, undefined, trackingElement);
 
  goog.events.listen(app.hist, goog.history.EventType.NAVIGATE, app.navCallback);
  app.hist.setEnabled(true);
  return app.hist;
+};
+goog.exportSymbol('app.initHistory', app.initHistory);
+
+
+/**
+ * SRC: _libCommon.js
+ * @param {string} session_ the session string.
+ */
+app.standardSuccessfulLogin = function(session_) {
+ app.GLOBAL.SESSION_ID = session_;
+ goog.net.cookies.set('session_id', session_);
+ goog.net.cookies.set('user_id',
+   goog.dom.getElement('LoginForm-user_id').value);
+ goog.dom.getElement('LoginForm-password').value = '';
+ app.hist.setToken(app.GLOBAL.TARGET_PAGE);
+};
+
+
+/**
+ * SRC: _libCommon.js
+ *
+ */
+app.attemptCookieLogin = function(){
+ var cmdParams = new app.Command('KEEP_ALIVE', 'AUTHENTICATE');
+ cmdParams['user_id'] = goog.net.cookies.get('user_id');
+ cmdParams['session_id'] = goog.net.cookies.get('session_id');
+
+ /** @type {function({goog.events.Event})} */
+ var callBack;
+ callBack = function(e) {
+  app.logger.finest('CallBack: attemptCookieLogin Request ');
+  /** @type {Object} */
+  var obj = e.target.getResponseJson();
+  if (obj.errorMsg == undefined){
+   /** @type {string}*/
+   var session = nz(goog.net.cookies.get('session_id'),'');
+   app.standardSuccessfulLogin(session);
+  } else {
+   goog.net.cookies.remove('user_id');
+   goog.net.cookies.remove('session');
+  }
+
+ };
+ app.server.cmdCall(cmdParams, callBack);
+
 }
-goog.exportSymbol('app.initHistory',app.initHistory);
+/**
+ *
+ * @param{string|null|undefined} val_ the value to unnull.
+ * @param{string} ifnull_ the value to return if null.
+ * @return{string}  the unnulled value.
+ */
+var nz = function(val_,ifnull_){
+ if (val_ == undefined || val_ == null) return ifnull_;
+ return val_;
+}
+goog.exportSymbol('nz', nz);
 
   //app.init = function(){
 // app.mainLog= new app.log();
