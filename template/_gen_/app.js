@@ -13,6 +13,7 @@ goog.require('goog.dom.query');
 goog.require('goog.events');
 goog.require('goog.events.EventHandler');
 goog.require('goog.history.EventType');
+goog.require('goog.json');
 goog.require('goog.net.XhrIo');
 goog.require('goog.net.cookies');
 goog.require('goog.object');
@@ -77,16 +78,15 @@ LoginWeb.onSuccessfulLogin = function(session_) {
 
 
 
-/*
+goog.provide('AppLogger');
+/**
  * SRC: appLogWeb.js
- *
+ * @param {Object} args_ rendering arguments.
  */
-
-function showAppLogger() {
- app.hist.setToken('AppLogger');
-
- }
-goog.exportSymbol('showAppLogger', showAppLogger);
+AppLogger.show = function(args_) {
+ app.standardShowPage('AppLogger');
+};
+//goog.exportSymbol('showAppLogger', showAppLogger);
 
 
 
@@ -94,13 +94,48 @@ goog.exportSymbol('showAppLogger', showAppLogger);
 goog.provide('MainLauncher');
 /**
  * SRC: _mainLauncherWeb.js
+ * @param {Object} args_ the args to pass to the show function.
  *
  */
-MainLauncher.show = function() {
-  //app.standardShowPage('MainLauncher');
- app.hist.setToken('MainLauncher');
+MainLauncher.show = function(args_) {
+  app.standardShowPage('MainLauncher');
 };
 
+
+  goog.provide('app.dispatcher');
+/**
+ * @param {string} request_ the request to dispatch.
+ *
+ */
+app.dispatcher = function(request_) {
+ /** @type {goog.Uri} */
+ var urlData = goog.Uri.parse(request_);
+ /** @type string*/
+ var key;
+ /** @type {Object} */
+ var qdObject = {};
+ if (app.currentDisplayDivs.length === 0) {
+  app.currentDisplayDivs.push('Login');
+ }
+ if (app.GLOBAL.SESSION_ID === 'PENDING') {
+  app.standardShowPage('Empty');
+  return;
+ }
+ for (key in urlData.queryData_.getKeys()) {
+  qdObject.key = urlData.queryData_.getValues(key);
+ }
+
+ switch (urlData.path_) {
+  case '':
+   app.GLOBAL.TARGET_PAGE = 'MainLauncher';
+   break;
+  case 'MainLauncher': MainLauncher.show(qdObject); break;
+  case 'AppLogger': AppLogger.show(qdObject); break;
+
+ }
+
+
+};
 
 
 goog.provide('app');
@@ -152,35 +187,6 @@ app.server.cmdCall = function(cmdParams, completeCallBack) {
 
 
 goog.provide('app.logEntry');
-/**
- * SRC: _libCommon.js
- * @param {string} msg_ the message to be logged.
- * @constructor
- */
-app.logEntry = function(msg_) {
- /** @type {Date}*/
- this.entryDt = new Date();
- /** @type {string}*/
- this.msg = msg_;
-};
-goog.provide('app.log');
-/**
- * SRC: _libCommon.js
- * @constructor
- */
-app.log = function() {
- /** @type {Array} */
- this.logArray = new Array();
-};
-
-/**
- * SRC: _libCommon.js
- * @param {app.logEntry} entry_  the log entry.
- */
-app.log.prototype.addEntry = function(entry_) {
- this.logArray.push(entry_);
-};
-
 
 
 /**
@@ -240,34 +246,10 @@ goog.provide('app.standardShowPage');
 /**
  * SRC: _libCommon.js
  * Hide all other divs and show the new one.
- * @param {goog.events.Event} event_  the div to show.
+ * @param {string} divToShow_  the div to show.
  * @return {boolean} false if exiting early.
  */
-app.standardShowPage = function(event_) {
- var divToShow = event_.token;
- if (divToShow == '') {
-  divToShow = 'Login';
-  app.GLOBAL.TARGET_PAGE = 'MainLauncher';
- } else if (divToShow.indexOf('-PENDING') > 0) {
-  //if there is a -PENDING it's a bogus request
-  if (event_.lastToken == null) {
-   divToShow = divToShow.replace('-PENDING', '');
-  }
-  return false;
- }
- if (app.GLOBAL.SESSION_ID == '') {
-  app.GLOBAL.SESSION_ID = goog.net.cookies.get('session_id');
-  if (app.GLOBAL.SESSION_ID != undefined) {
-   app.attemptCookieLogin();
-  }
-  if (divToShow != 'Login') {
-   app.GLOBAL.TARGET_PAGE = divToShow;
-   app.hist.replaceToken(app.hist.getToken() + '-PENDING');
-  }
-  divToShow = 'Login';
-  app.currentDisplayDivs.push(divToShow);
-  return false;
- }
+app.standardShowPage = function(divToShow_) {
  /** @type {string} */
  var visibleDiv;
  /** @type {Element} */
@@ -276,9 +258,9 @@ app.standardShowPage = function(event_) {
   element = goog.dom.getElement(visibleDiv + 'DivId');
   goog.dom.classes.add(element, 'LogicalHide');
  }
- element = goog.dom.getElement((divToShow + 'DivId'));
+ element = goog.dom.getElement((divToShow_ + 'DivId'));
  goog.dom.classes.remove(element, 'LogicalHide');
- app.currentDisplayDivs.push(divToShow);
+ app.currentDisplayDivs.push(divToShow_);
  //_gaq.push(['_trackPageview', divToShow_]);
   return true;
 };
@@ -289,8 +271,40 @@ app.standardShowPage = function(event_) {
  * @param {goog.events.Event} e the event.
  */
 app.navCallback = function(e) {
- app.standardShowPage(e);
+  if (app.authenticate(e.token)) {
+    app.dispatcher(e.token);
+  }
 
+
+};
+
+
+
+/**
+*
+* @param {string} target_ the target resource.
+* @return {boolean} is authenticated.
+*/
+app.authenticate = function(target_) {
+  if (app.GLOBAL.SESSION_ID === 'PENDING') return false;
+  if (app.GLOBAL.SESSION_ID == '') {
+  //app.GLOBAL.SESSION_ID = goog.net.cookies.get('session_id');
+    app.GLOBAL.TARGET_PAGE = (target_ == '')? 'MainLauncher' : target_;
+     app.GLOBAL.SESSION_ID = 'PENDING';
+    app.hist.setToken('');
+  if (goog.net.cookies.get('user_id') != undefined) {
+   //this would normally be in the dispatcher, but can cookie login
+   // can return before it gets there
+
+
+   app.attemptCookieLogin();
+   return true;
+    } else {
+    return false;
+    }
+} else {
+  return true;
+}
 };
 /**
  *
@@ -313,6 +327,19 @@ app.initHistory = function() {
  return app.hist;
 };
 goog.exportSymbol('app.initHistory', app.initHistory);
+/**
+*
+* @param {string} page_ the page to show.
+*/
+
+app.showPage = function(page_) {
+  //if( ('#' + page_) === window.location.hash){
+ //   app.hist.setToken(page_ +'?');
+  //}else{
+    app.hist.setToken(page_);
+  //}
+};
+goog.exportSymbol('showPage', app.showPage);
 
 
 /**
@@ -325,7 +352,7 @@ app.standardSuccessfulLogin = function(session_) {
  goog.net.cookies.set('user_id',
    goog.dom.getElement('LoginForm-user_id').value);
  goog.dom.getElement('LoginForm-password').value = '';
- app.hist.setToken(app.GLOBAL.TARGET_PAGE);
+ app.showPage(app.GLOBAL.TARGET_PAGE);
 };
 
 
@@ -333,7 +360,7 @@ app.standardSuccessfulLogin = function(session_) {
  * SRC: _libCommon.js
  *
  */
-app.attemptCookieLogin = function(){
+app.attemptCookieLogin = function() {
  var cmdParams = new app.Command('KEEP_ALIVE', 'AUTHENTICATE');
  cmdParams['user_id'] = goog.net.cookies.get('user_id');
  cmdParams['session_id'] = goog.net.cookies.get('session_id');
@@ -344,29 +371,29 @@ app.attemptCookieLogin = function(){
   app.logger.finest('CallBack: attemptCookieLogin Request ');
   /** @type {Object} */
   var obj = e.target.getResponseJson();
-  if (obj.errorMsg == undefined){
+  if (obj.errorMsg == undefined) {
    /** @type {string}*/
-   var session = nz(goog.net.cookies.get('session_id'),'');
+   var session = nz(goog.net.cookies.get('session_id'), '');
    app.standardSuccessfulLogin(session);
   } else {
    goog.net.cookies.remove('user_id');
-   goog.net.cookies.remove('session');
+   goog.net.cookies.remove('session_id');
   }
 
  };
  app.server.cmdCall(cmdParams, callBack);
 
-}
+};
 /**
  *
- * @param{string|null|undefined} val_ the value to unnull.
- * @param{string} ifnull_ the value to return if null.
- * @return{string}  the unnulled value.
+ * @param {string|null|undefined} val_ the value to unnull.
+ * @param {string} ifnull_ the value to return if null.
+ * @return {string}  the unnulled value.
  */
-var nz = function(val_,ifnull_){
+var nz = function(val_, ifnull_) {
  if (val_ == undefined || val_ == null) return ifnull_;
  return val_;
-}
+};
 goog.exportSymbol('nz', nz);
 
   //app.init = function(){

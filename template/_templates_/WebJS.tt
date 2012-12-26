@@ -15,6 +15,7 @@ goog.require('goog.dom.query');
 goog.require('goog.events');
 goog.require('goog.events.EventHandler');
 goog.require('goog.history.EventType');
+goog.require('goog.json');
 goog.require('goog.net.XhrIo');
 goog.require('goog.net.cookies');
 goog.require('goog.object');

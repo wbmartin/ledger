@@ -6,7 +6,7 @@
 [%- # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -%]
 [%FOREACH tPath = appTemplates%]
 <!--[%tPath%] -->
-  [%-IF  tPath.match('Web')-%]
+  [%-IF  tPath.match('Web') or tPath.match('Common') -%]
 	  [%-IF tPath.match('js'); NEXT; END;-%]
 	  [%-IF tPath.match('\/x'); NEXT; END;-%]
 		<!-- From: [%tPath%] -->
