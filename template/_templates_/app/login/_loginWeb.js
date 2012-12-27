@@ -7,16 +7,22 @@ goog.provide('LoginWeb');
  *
  */
 [%divId%]Web.init = function() {
-	[%divId%]Web.logger = goog.debug.Logger.getLogger('[%divId%]');
-	[%divId%]Web.logger.info('Initialized');
-	[%divId%]Web.logger.setLevel(goog.debug.Logger.Level.ALL);
+	if (LL.ON) {
+		[%divId%]Web.logger = goog.debug.Logger.getLogger('[%divId%]');
+		[%divId%]Web.logger.setLevel(app.GLOBAL.LOG_LEVEL);
+	}
+	if (LL.INFO) {
+		[%divId%]Web.logger.info('Initialized');
+	}
 };
 goog.exportSymbol('[%divId%]Web.init', [%divId%]Web.init);
 /**
  *  SRC: [% SRC_LOC%]
  */ 
 [%divId%]Web.start = function() {
-	[%divId%]Web.logger.finest('Call start');
+	if (LL.FINEST) {
+		[%divId%]Web.logger.finest('Call start');
+	}
 	/** @type {app.Command} */
 	var cmdParams = new app.Command('SECURITY_USER', 'AUTHENTICATE');
 	cmdParams.digest(app.form.getValues('[%divId%]Form'));
@@ -42,7 +48,7 @@ goog.exportSymbol('[%divId%]Web.start', [%divId%]Web.start);
 [%divId%]Web.[%f%] = function(session_) {
 	[%divId%]Web.logger.finest('Call [%f%]');
 	app.standardSuccessfulLogin(session_);
-	
+
 };
 
 /**

@@ -414,7 +414,7 @@ form.inline p { margin-bottom:0; }
  </style>
  </head>
 <body>
-<!--./template/_templates_/app/login/_loginCommon.html -->
+<!--./template/_templates_/app/login/_loginCommon.html --> <!-- From: ./template/_templates_/app/login/_loginCommon.html -->
 <!--./template/_templates_/app/login/_loginCommon.js -->
 <!--./template/_templates_/app/login/_loginWeb.js -->
 <!--./template/_templates_/app/login/_loginMobile.js -->
@@ -455,7 +455,7 @@ form.inline p { margin-bottom:0; }
 <!--./template/_templates_/app/appLog/_appLogMobile.js -->
 <!--./template/_templates_/app/appLog/_appLogCommon.js -->
 <!--./template/_templates_/app/appLog/_appLogWeb.js -->
-<!--./template/_templates_/app/appLog/_appLogCommon.html -->
+<!--./template/_templates_/app/appLog/_appLogCommon.html --> <!-- From: ./template/_templates_/app/appLog/_appLogCommon.html -->
 <!--./template/_templates_/app/appLog/_appLogWeb.html --> <!-- From: ./template/_templates_/app/appLog/_appLogWeb.html -->
 <div id="AppLoggerDivId" class="LogicalHide">
  <fieldset class="goog-debug-panel">
@@ -467,7 +467,7 @@ form.inline p { margin-bottom:0; }
 <!--./template/_templates_/app/xStyle/mainWeb.css -->
 <!--./template/_templates_/app/xStyle/mainMobile.css -->
 <!--./template/_templates_/app/xStyle/1140.css -->
-<!--./template/_templates_/app/mainLauncher/_mainLauncherCommon.html -->
+<!--./template/_templates_/app/mainLauncher/_mainLauncherCommon.html --> <!-- From: ./template/_templates_/app/mainLauncher/_mainLauncherCommon.html -->
 <!--./template/_templates_/app/mainLauncher/_mainLauncherMobile.html -->
 <!--./template/_templates_/app/mainLauncher/_mainLauncherWeb.html --> <!-- From: ./template/_templates_/app/mainLauncher/_mainLauncherWeb.html -->
 <div id="MainLauncherDivId" class="LogicalHide">
@@ -498,7 +498,7 @@ form.inline p { margin-bottom:0; }
 <!--./template/_templates_/app/mainLauncher/_mainLauncherWeb.js -->
 <!--./template/_templates_/app/mainLauncher/_mainLauncherCommon.js -->
 <!--./template/_templates_/app/mainLauncher/_mainLauncherMobile.js -->
-<!--./template/_templates_/app/dispatcher/dispatcherCommon.html -->
+<!--./template/_templates_/app/dispatcher/dispatcherCommon.html --> <!-- From: ./template/_templates_/app/dispatcher/dispatcherCommon.html -->
 <!--./template/_templates_/app/dispatcher/dispatcherWeb.js -->
 <!--./template/_templates_/app/xFooter/_footerWeb.js -->
 <!--./template/_templates_/app/xFooter/_footerCommon.js -->
@@ -507,18 +507,22 @@ form.inline p { margin-bottom:0; }
 <!--./template/_templates_/app/xFooter/_footerCommon.html -->
 <!--./template/_templates_/app/xFooter/_footerMobile.html -->
 <!--./template/_templates_/app/xHeader/_headerWeb.html -->
+<!--./template/_templates_/app/xHeader/headerWeb.js -->
 <!--./template/_templates_/app/xHeader/_headerMobile.html -->
 <!--./template/_templates_/app/lib/libMobile.js -->
 <!--./template/_templates_/app/lib/_libCommon.js -->
 <!--./template/_templates_/app/lib/libWeb.js --><form>
  <input type="text" name="historyTrackerId" id = "historyTrackierId" style="display:none;" >
 </form>
+<div id="EmptyDivId" class="LogicalHide"><!--dispatchercommon.html --> &nbsp; </div>
 <script type="text/javascript" src="app-compiled.js"></script>
 <script type="text/javascript" >
 document.getElementById('LoginForm-user_id').value = 'ledger';
 document.getElementById('LoginForm-password').value = 'ledger';
 app.initLogger();
 LoginWeb.init();
+AppLoggerWeb.init();
+MainLauncherWeb.init();
 app.initHistory();
 </script>
 </body>

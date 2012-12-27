@@ -22,6 +22,7 @@ goog.require('goog.object');
 goog.require('goog.string');
 
 [% # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -%]
+[%INCLUDE app/xHeader/headerWeb.js%]
 [%FOREACH tPath = appTemplates%]
   [%-IF  tPath.match('Web') or tPath.match('Common')-%]
 	  [%-IF tPath.match('html'); NEXT; END;-%]
