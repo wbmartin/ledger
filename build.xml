@@ -1,0 +1,46 @@
+<project name="ledger" default="build" basedir=".">
+	<description>
+		General Ledger Build
+	</description>
+	<property name="template.src" location="${basedir}"/>
+	<property name="outputPath" location="${basedir}/template/_gen_"/>
+	<property name="builddir" location ="${basedir}/build/app"/>
+	<target name="generateTemplates">
+		<echo>Generating Templates</echo>
+		<exec dir="${basedir}" executable="perl">
+			<arg value="generateTemplates.pl"/>
+			<arg value="${basedir}"/>
+		</exec>
+
+	</target>
+	<target name="pushToBuildDir">
+		<copy file="${outputPath}/index.html" todir="${builddir}"/>
+		<copy file="${outputPath}/app.js" todir="${builddir}"/>
+		<copy file="${outputPath}/webpages.js" todir="${builddir}"/>
+	</target>
+	<target name="compileSoy">
+		<exec executable="java">
+			<arg line="-jar /home/wbmartin/dev/closurecompiler/SoyToJsSrcCompiler.jar"/>
+			<arg line="--outputPathFormat ${outputPath}/webpages.js "/>
+			<arg line="--srcs ${outputPath}/webpages.soy"/>
+		</exec>
+		<copy file="${outputPath}/webpages.js" todir="${builddir}"/>
+	</target>
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp/>
+	</target>
+	<target name="build-clean">
+		<delete>
+			
+		</delete>
+
+	</target>
+	<target name="build" depends="init, build-clean">
+		<echo>Building</echo>
+		<antcall target="generateTemplates"/>
+		<antcall target="compileSoy"/>
+		<antcall target="pushToBuildDir"/>
+	</target>
+
+</project>

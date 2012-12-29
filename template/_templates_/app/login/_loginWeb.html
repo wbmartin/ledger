@@ -1,7 +1,10 @@
-<!--Begin LoginPortal-->
 [%divId="Login"%]
 [%spwfResource="security_user"%]
-
+/**
+ *[%divId%]
+ */
+{template .[%divId%]}
+<!--Begin LoginPortal-->
 <div id="[%divId%]DivId"  class="displayOnLoad">
 	<form id="[%divId%]Form" action="">
 		<div class="formLayout_Standard prettyWrapper" style="width:30em;">
@@ -42,4 +45,5 @@
 	</form>  
 	<a href="" onclick="LoginWeb.start(); return false;">test</a>
 </div>
+{/template}
 

@@ -3,6 +3,10 @@ clear
 srcpath="."
 ./generateTemplates.pl $srcpath
 outputPath="./template/_gen_"
+
+java -jar /home/wbmartin/dev/closurecompiler/SoyToJsSrcCompiler.jar --outputPathFormat $outputPath/webpages.js --srcs $outputPath/webpages.soy
+# $outputPath/app.js
+
 #Post Processing
 echo "replacing Tabs\n";
 perl -p -i -e 's/\t/ /g' $outputPath/app.js;
@@ -30,6 +34,7 @@ perl -p -i -e 's/ +/ /g' $outputPath/index.html;
 #File Copies
 cp $outputPath/index.html ./build/app/; # copy the generated index.html
 cp $outputPath/app.js ./build/app/; # copy the generated app.js
+cp $outputPath/webpages.js ./build/app/; # copy the generated app.js
 #cp $outputPath/mobile.html $absoluteSrcPath/deploy/mobile/index.html; # copy the generated mobile
 #cp $outputPath/appmobile.js $absoluteSrcPath/deploy/mobile/; # copy the generated mobile
 #print "\n\n";

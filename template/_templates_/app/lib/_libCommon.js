@@ -47,7 +47,7 @@ app.GLOBAL.TARGET_PAGE = 'MainLauncher';
 [%f='server.cmdCall'%]
 app.[%f%] = function(cmdParams, completeCallBack) {
 	if (LL.FINEST) {
-		app.logger.finest('Call: app.[%f%] ' + 
+		app.logger.finest('Call: [%f%] ' + 
 				goog.debug.expose(cmdParams));
 	}
 	/** @type {goog.net.XhrIo}*/
@@ -137,7 +137,7 @@ app.[%f%] = function(divToShow_) {
 	element = goog.dom.getElement((divToShow_ + 'DivId'));
 	goog.dom.classes.remove(element, 'LogicalHide');
 	app.GLOBAL.currentDisplayDivs.push(divToShow_);
-	//_gaq.push(['_trackPageview', divToShow_]);
+	window['_gaq'].push(['_trackPageview', divToShow_]);
 	return true;
 };
 
@@ -189,7 +189,8 @@ app.[%f%] = function(target_) {
 app.initHistory = function() {
 	/** 
 	 *This input is located in _footerWeb.html
-	 * @type {HTMLInputElement} */
+	 * @type {HTMLInputElement} 
+ */
 	var trackingElement = /** @type {HTMLInputElement} */
 		(goog.dom.getElement('historyTrackerId'));
 	app.hist = new goog.History(false, undefined, trackingElement);
@@ -256,7 +257,7 @@ app.[%f%] = function() {
 		/** @type {Object} */
 		var obj = e.target.getResponseJson();
 		if (obj.errorMsg == undefined) {
-			/** @type {string}*/
+			/** @type {string} */
 			var session = nz(goog.net.cookies.get('session_id'), '');
 			app.standardSuccessfulLogin(session);
 		} else {

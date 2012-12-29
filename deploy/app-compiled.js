@@ -2800,7 +2800,7 @@ $goog$exportSymbol$$("app.initLogger", function() {
 });
 var $app$GLOBAL$TARGET_PAGE$$ = "MainLauncher";
 function $app$server$cmdCall$$($cmdParams$$1$$, $completeCallBack$$) {
-  $JSCompiler_StaticMethods_finest$$($app$logger$$, "Call: app.server.cmdCall " + $goog$debug$expose$$($cmdParams$$1$$));
+  $JSCompiler_StaticMethods_finest$$($app$logger$$, "Call: server.cmdCall " + $goog$debug$expose$$($cmdParams$$1$$));
   var $xhr$$1$$ = new $goog$net$XhrIo$$;
   $goog$events$listen$$($xhr$$1$$, "complete", $completeCallBack$$);
   $xhr$$1$$.send("./cgi-bin/server.pl", "POST", $goog$json$serialize$$($cmdParams$$1$$))
@@ -2816,7 +2816,8 @@ function $app$standardShowPage$$($divToShow_$$) {
   }
   $element$$74_visibleDiv$$ = $goog$dom$getElement$$($divToShow_$$ + "DivId");
   $goog$dom$classes$remove$$($element$$74_visibleDiv$$, "LogicalHide");
-  $app$GLOBAL$currentDisplayDivs$$.push($divToShow_$$)
+  $app$GLOBAL$currentDisplayDivs$$.push($divToShow_$$);
+  window._gaq.push(["_trackPageview", $divToShow_$$])
 }
 function $app$navCallback$$($e$$51_request_$$inline_592_urlData$$inline_593$$) {
   if($app$authenticate$$($e$$51_request_$$inline_592_urlData$$inline_593$$.$token$)) {
