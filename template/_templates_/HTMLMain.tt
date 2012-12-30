@@ -7,7 +7,7 @@
 
 <script type="text/javascript">
     // Exercise the .helloWorld template
-    document.write(app.pages.Login());
+    document.write(app.Login.view.getPrimary());
   </script>
 
 </body>

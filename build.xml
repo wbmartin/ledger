@@ -2,7 +2,7 @@
 	<description>
 		General Ledger Build
 	</description>
-	<property name="template.src" value="${basedir}"/>
+	<property name="template.dir" value="${basedir}/template/_templates_"/>
 	<property name="templategen.dir" value="${basedir}/template/_gen_"/>
 	<property name="build.dir" value ="${basedir}/build/app"/>
 	<property name="deploy.dir" value="${basedir}/deploy"/>
@@ -17,17 +17,22 @@
 		</exec>
 	</target>
 
-	<target name="pushToBuildDir">
+	<target name="build-push">
 		<copy file="${templategen.dir}/index.html" todir="${build.dir}"/>
 		<copy file="${templategen.dir}/app.js" todir="${build.dir}"/>
 		<copy file="${templategen.dir}/webpages.js" todir="${build.dir}"/>
+		<copy file="${template.dir}/app/lib/soyutils_usegoog.js" todir="${build.dir}"/>
 	</target>
 
-	<target name="compileSoy">
+	<target name="build-soy">
+		<fileset id="soy.dir" dir="${templategen.dir}" includes="*.soy"/> 
+		<pathconvert pathsep=" --srcs " property="soyfiles" refid="soy.dir"/>
+		<echo message="${soyfiles}"/>
 		<exec executable="java">
 			<arg line="-jar ${soycompiler.dir}/SoyToJsSrcCompiler.jar"/>
-			<arg line="--outputPathFormat ${templategen.dir}/webpages.js "/>
-			<arg line="--srcs ${templategen.dir}/webpages.soy"/>
+			<arg line="--outputPathFormat ${templategen.dir}/webpages.js"/>
+			<arg line="--shouldProvideRequireSoyNamespaces"/>
+			<arg line="--srcs ${soyfiles}"/>
 		</exec>
 		<copy file="${templategen.dir}/webpages.js" todir="${build.dir}"/>
 	</target>
@@ -76,9 +81,9 @@
 	</target>
 	<target name="build" depends="init, build-clean">
 		<antcall target="generateTemplates"/>
-		<antcall target="compileSoy"/>
+		<antcall target="build-soy"/>
 		<!--antcall target="build-postclean"/-->
-		<antcall target="pushToBuildDir"/>
+		<antcall target="build-push"/>
 	</target>
 	<target name="deploy" depends="init, deploy-clean">
 		<antcall target="deploy-push"/>

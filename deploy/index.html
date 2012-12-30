@@ -530,10 +530,10 @@ form.inline p { margin-bottom:0; }
 </form>
 <div id="EmptyDivId" class="LogicalHide"><!--dispatchercommon.html --> &nbsp; </div>
 <script type="text/javascript" src="app-compiled.js"></script>
+
 <script type="text/javascript" >
-document.getElementById('LoginForm-user_id').value = 'ledger';
-document.getElementById('LoginForm-password').value = 'ledger';
-app.initLogger();
+	document.write(app.AppLogger.view.getPrimary());
+	app.initLogger();
 LoginWeb.init();
 AppLoggerWeb.init();
 MainLauncherWeb.init();
@@ -545,7 +545,7 @@ app.initHistory();
 
 <script type="text/javascript">
     // Exercise the .helloWorld template
-    document.write(app.pages.Login());
+    document.write(app.Login.view.getPrimary());
   </script>
 
 </body>

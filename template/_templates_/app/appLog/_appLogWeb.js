@@ -1,6 +1,8 @@
 [%divId="AppLogger"%]
 [%SRC_LOC = 'appLogWeb.js'%]
 goog.provide('[%divId%]Web');
+goog.require('app.[%divId%].view');
+goog.exportSymbol('app.[%divId%].view.getPrimary', app.[%divId%].view.getPrimary);
 /**
  * SRC: [%SRC_LOC%]
  * @param {Object} args_ rendering arguments.

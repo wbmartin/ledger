@@ -48,6 +48,8 @@ LL.ALL = true;
 		
 
 goog.provide('LoginWeb');
+goog.require('app.Login.view');
+goog.exportSymbol('app.Login.view.getPrimary', app.Login.view.getPrimary);
 
 /**
  *
@@ -109,6 +111,8 @@ LoginWeb.onSuccessfulLogin = function(session_) {
 		
 
 goog.provide('AppLoggerWeb');
+goog.require('app.AppLogger.view');
+goog.exportSymbol('app.AppLogger.view.getPrimary', app.AppLogger.view.getPrimary);
 /**
  * SRC: appLogWeb.js
  * @param {Object} args_ rendering arguments.
@@ -137,8 +141,7 @@ goog.exportSymbol('AppLoggerWeb.init', AppLoggerWeb.init);
 		 
 		
 
-
-
+goog.require('app.MainLauncher.view');
 goog.provide('MainLauncherWeb');
 /**
  * SRC: _mainLauncherWeb.js
@@ -481,3 +484,7 @@ app.dispatcher = function(request_) {
 		app.dispatch[urlData.path_](qdObject);
 	}
 };
+//document.getElementById('LoginForm-user_id').value = 'ledger';
+//document.getElementById('LoginForm-password').value = 'ledger';
+
+

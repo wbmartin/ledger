@@ -1,6 +1,8 @@
 [%divId="Login"%]
 [% SRC_LOC = '_loginWeb'%]
 goog.provide('LoginWeb');
+goog.require('app.[%divId%].view');
+goog.exportSymbol('app.[%divId%].view.getPrimary', app.[%divId%].view.getPrimary);
 
 /**
  *

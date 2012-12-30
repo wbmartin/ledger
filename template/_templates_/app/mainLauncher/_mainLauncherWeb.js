@@ -1,7 +1,6 @@
 [%divId="MainLauncher"%]
 [%SRC_LOC="_mainLauncherWeb.js"%]
-
-
+goog.require('app.[%divId%].view');
 goog.provide('[%divId%]Web');
 /**
  * SRC: [%SRC_LOC%]

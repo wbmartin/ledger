@@ -19,7 +19,7 @@ $templatePath = "$absoluteSrcPath/template/_templates_/";
 	&DBGenUTIL::getTables($dbh,\%tables);
 my @appTemplates ;
 &populateWebTemplates(\@appTemplates,"$absoluteSrcPath/template/_templates_/app");
-	$var = {tbl=>\%tables,props=>\%props, toCC=>\&DBGenUTIL::toCC, ucfirst =>\&DBGenUTIL::ucf, lcfirst =>\&DBGenUTIL::lcf, appTemplates=>\@appTemplates };
+	$var = {tbl=>\%tables,props=>\%props, toCC=>\&DBGenUTIL::toCC, ucfirst =>\&DBGenUTIL::ucf, lcfirst =>\&DBGenUTIL::lcf, appTemplates=>\@appTemplates, getFileName =>\&DBGenUTIL::getFileName };
 	&DBGenUTIL::grabTemplates($templatePath, \@templates);
 print "\nif you're missing a table, be sure you've granted security.\n";
 print "\nTables: ";

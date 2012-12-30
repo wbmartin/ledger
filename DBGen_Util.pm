@@ -261,6 +261,10 @@ sub ucf($){
 sub lcf($){
 	return lcfirst(shift);
 }
-
+sub getFileName($){
+ my $path = shift;
+ $path =~ /\/(\w*?).html/;
+ return $1;
+}
 return 1;
 
