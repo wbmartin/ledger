@@ -20,16 +20,22 @@ goog.require('goog.net.XhrIo');
 goog.require('goog.net.cookies');
 goog.require('goog.object');
 goog.require('goog.string');
+goog.require('goog.userAgent');
+goog.require('app.AppLogger.view');
+goog.require('app.Login.view');
+goog.require('app.MainLauncher.view');
+goog.require('soy');
+goog.require('soydata');
 
 [% # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -%]
 [%INCLUDE app/xHeader/_headerWeb.js%]
 [%FOREACH tPath = appTemplates%]
   [%-IF  tPath.match('Web') or tPath.match('Common')-%]
-	  [%-IF tPath.match('html'); NEXT; END;-%]
-	  [%-IF tPath.match('/x'); NEXT; END;-%]
-		[%#// From: [%tPath%] 
-		[%INCLUDE $tPath%]
-	[%-END-%]
+    [%-IF tPath.match('html'); NEXT; END;-%]
+    [%-IF tPath.match('/x'); NEXT; END;-%]
+    [%#// From: [%tPath%] 
+    [%INCLUDE $tPath%]
+  [%-END-%]
 [%-END-%]
 [% # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-%]
 [%INCLUDE app/xFooter/_footerWeb.js%]

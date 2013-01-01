@@ -16,7 +16,7 @@ return;
 
 sub grabTemplates{
   my ($path, $templates) = @_;
-	print "Grabbing Templates Path: $path\n";
+  print "Grabbing Templates Path: $path\n";
   opendir (DIR, $path) or die "$!";
    @{$templates} = grep {/tt/} readdir DIR;
   close DIR;
@@ -27,9 +27,9 @@ sub getProps($$){
   my ($key,$value);
   open(FILE, "$path");
   while (<FILE>){
-	s/\n//g;
-	($key,$value) = split(/:/);
-	$props->{$key} = $value;
+  s/\n//g;
+  ($key,$value) = split(/:/);
+  $props->{$key} = $value;
 #print "props: $key | $value\n";
   }
 
@@ -38,7 +38,7 @@ return;
 
 
 sub getTables($){
-  my($dbh) 	= shift;
+  my($dbh)   = shift;
   my($tables)= shift;
   my($table);
   my($sth, $info,@row, $field,$ndx,@prKeys, $prKeyNdx,%columns,);
@@ -61,22 +61,22 @@ $sth = $dbh->prepare("SELECT table_name, table_type FROM information_schema.tabl
 $sth->execute();
   while (@row = $sth->fetchrow) { 
 #print " table: $row[0] ";
-	#next if ($row[3] eq "SYSTEM TABLE"); 
-	#next if ($row[3] eq "SYSTEM VIEW"); 
-	$table = $row[0];
-	$columnhashref[$ndx]={};
-	$prKeyArrayref[$ndx]=[];
-	$ordPosArrayref[$ndx]=[];
-	&getFields($dbh, $table, $columnhashref[$ndx],$prKeyArrayref[$ndx], $ordPosArrayref[$ndx]);
-	$tables->{$table} = {	type =>$row[1], 
-				columns => $columnhashref[$ndx], 
-				prkeys =>$prKeyArrayref[$ndx],	
-				col_ord_pos => $ordPosArrayref[$ndx],			 
-				java_name=>lcfirst(toCC($table))
-	};
-	
+  #next if ($row[3] eq "SYSTEM TABLE"); 
+  #next if ($row[3] eq "SYSTEM VIEW"); 
+  $table = $row[0];
+  $columnhashref[$ndx]={};
+  $prKeyArrayref[$ndx]=[];
+  $ordPosArrayref[$ndx]=[];
+  &getFields($dbh, $table, $columnhashref[$ndx],$prKeyArrayref[$ndx], $ordPosArrayref[$ndx]);
+  $tables->{$table} = {  type =>$row[1], 
+        columns => $columnhashref[$ndx], 
+        prkeys =>$prKeyArrayref[$ndx],  
+        col_ord_pos => $ordPosArrayref[$ndx],       
+        java_name=>lcfirst(toCC($table))
+  };
+  
 
-	$ndx++;
+  $ndx++;
 
 
   }
@@ -84,50 +84,50 @@ $sth->execute();
 #print "\nclient Type: $tables->{'client'}->{'type'}\n";
 #print "\nclient.client_id prkey : $tables->{'client'}->{'columns'}->{'client_id'}->{'prkey'}\n";
 #print "\nclient.client_id name : $tables->{'client'}->{'columns'}->{'client_id'}->{'column_name'}\n";
-	$sth->finish;
+  $sth->finish;
 }
 
 ############################################################
 sub getFields{
-	my($dbh) = shift;
-	my($table) = shift;
-	my($columns) = shift;
-	my($prKeys) = shift;
-	my($ordPos) = shift;
-	my($schema) = shift;
-	my($sth, $row, $field,@prKeys, ,$schema, $catalog, $isPrKey,$isAutoInc, $columnDef, $ndx);
+  my($dbh) = shift;
+  my($table) = shift;
+  my($columns) = shift;
+  my($prKeys) = shift;
+  my($ordPos) = shift;
+  my($schema) = shift;
+  my($sth, $row, $field,@prKeys, ,$schema, $catalog, $isPrKey,$isAutoInc, $columnDef, $ndx);
 #print "DEBUG: inGetFields\n";
 
-	$catalog ='';#Postgres	
-	$schema ='';#Postgres
-	#@prKeys = $dbh->primary_key($catalog, $schema, $table );
-	#print "DEBUG About to call primary keys $table\n";
-	@$prKeys = $dbh->primary_key($catalog, $schema,$table );
-	#print "DEBUG: just finished prkeys, calling Column info\n";
-	$sth = $dbh->prepare( "SELECT * FROM information_schema.columns WHERE table_name = '$table' order by ordinal_position;"); #postgres
-    	$sth->execute();
-	while ($row = $sth->fetchrow_hashref) {
-	  $isPrKey="N";
-	  $isAutoInc="N";
-	  foreach(@$prKeys){ #Note the while is looping over each field
-	    if( $row->{column_name} eq $_ ){ $isPrKey="Y"; last; }		
-	  }
-	  if( $row->{column_default} =~/nextval/ ){ $isAutoInc="Y";  }
+  $catalog ='';#Postgres  
+  $schema ='';#Postgres
+  #@prKeys = $dbh->primary_key($catalog, $schema, $table );
+  #print "DEBUG About to call primary keys $table\n";
+  @$prKeys = $dbh->primary_key($catalog, $schema,$table );
+  #print "DEBUG: just finished prkeys, calling Column info\n";
+  $sth = $dbh->prepare( "SELECT * FROM information_schema.columns WHERE table_name = '$table' order by ordinal_position;"); #postgres
+      $sth->execute();
+  while ($row = $sth->fetchrow_hashref) {
+    $isPrKey="N";
+    $isAutoInc="N";
+    foreach(@$prKeys){ #Note the while is looping over each field
+      if( $row->{column_name} eq $_ ){ $isPrKey="Y"; last; }    
+    }
+    if( $row->{column_default} =~/nextval/ ){ $isAutoInc="Y";  }
 
-	  $row->{prkey} = $isPrKey;
-	  $row->{auto_inc} = $isAutoInc;
-	  $row->{java_name}=lcfirst(toCC($row->{column_name}));
-	  $row->{english_name}=&toEnglish($row->{column_name});
-	  $row->{java_type}= &getJavaType($row->{data_type});
-	  $row->{java_sql_type}= &getJavaSQLType($row->{data_type});
-	  $row->{boxed_type} =&getBoxedType($row->{data_type});
-	  $row->{smart_field_type} =&getSmartFieldType($row->{data_type});
-	  $row->{data_type} =~ s/ without time zone//;
-	  $row->{ord_pos} = $ndx;
-	  $row->{get_method} = &getGetMethod( $row->{java_name}, $row->{java_type} );
-	  $columns->{$row->{column_name}} =$row;
-	  $ordPos->[$ndx++] = $row->{column_name};
-	  
+    $row->{prkey} = $isPrKey;
+    $row->{auto_inc} = $isAutoInc;
+    $row->{java_name}=lcfirst(toCC($row->{column_name}));
+    $row->{english_name}=&toEnglish($row->{column_name});
+    $row->{java_type}= &getJavaType($row->{data_type});
+    $row->{java_sql_type}= &getJavaSQLType($row->{data_type});
+    $row->{boxed_type} =&getBoxedType($row->{data_type});
+    $row->{smart_field_type} =&getSmartFieldType($row->{data_type});
+    $row->{data_type} =~ s/ without time zone//;
+    $row->{ord_pos} = $ndx;
+    $row->{get_method} = &getGetMethod( $row->{java_name}, $row->{java_type} );
+    $columns->{$row->{column_name}} =$row;
+    $ordPos->[$ndx++] = $row->{column_name};
+    
 #$columns->{$row->{column_name}} =$row;
 #print "DEBUG: in get fields1 - $row->{column_name}\n";
 #print "DEBUG: in get fieldsprkey - $columns->{'client_id'}{'prkey'}\n";
@@ -135,7 +135,7 @@ sub getFields{
 #print "DEBUG: in getfields datatype- $columns->{'client_id'}->{'data_type'}\n";
       }
 
-	$sth->finish;
+  $sth->finish;
 
 return;
 }
@@ -165,15 +165,15 @@ sub getJavaType($){
   my($in) = shift;
   my($out)="";
   my($JavaType)= {
-    	"text"=>"String",
-	"integer" =>"int",
-	"timestamp without time zone" =>"Date",
-	"timestamp with time zone" =>"Date",
-	"character"=>"String",
-	"character varying"=>"String",
-	"date"=>"java.util.Date"
-	,"double precision"=>"Double"
-	,"real"=>"Double"
+      "text"=>"String",
+  "integer" =>"int",
+  "timestamp without time zone" =>"Date",
+  "timestamp with time zone" =>"Date",
+  "character"=>"String",
+  "character varying"=>"String",
+  "date"=>"java.util.Date"
+  ,"double precision"=>"Double"
+  ,"real"=>"Double"
 
   };
 $out =  $JavaType->{$in};
@@ -186,15 +186,15 @@ sub getJavaSQLType($){
   my($in) = shift;
   my($out)="";
   my($JavaType)= {
-    	"text"=>"String",
-	"integer" =>"Int",
-	"timestamp without time zone" =>"Timestamp",
-	"timestamp with time zone" =>"Timestamp",
-	"character"=>"String",
-	"character varying"=>"String",
-	"date"=>"date"
-	,"double precision"=>"Double"
-	,"real"=>"Double"
+      "text"=>"String",
+  "integer" =>"Int",
+  "timestamp without time zone" =>"Timestamp",
+  "timestamp with time zone" =>"Timestamp",
+  "character"=>"String",
+  "character varying"=>"String",
+  "date"=>"date"
+  ,"double precision"=>"Double"
+  ,"real"=>"Double"
 
   };
 $out =  $JavaType->{$in};
@@ -208,15 +208,15 @@ sub getBoxedType($){
   my($in) = shift;
   my($out)="";
   my($BoxedType)= {
-    	"text"=>"String",
-	"integer" =>"Integer",
-	"timestamp without time zone" =>"Date",
-	"timestamp with time zone" =>"Date",
-	"character"=>"String",
-	"character varying"=>"String",
-	"date"=>"java.util.Date"
-	,"double precision"=>"Double"
-	,"real"=>"Double"
+      "text"=>"String",
+  "integer" =>"Integer",
+  "timestamp without time zone" =>"Date",
+  "timestamp with time zone" =>"Date",
+  "character"=>"String",
+  "character varying"=>"String",
+  "date"=>"java.util.Date"
+  ,"double precision"=>"Double"
+  ,"real"=>"Double"
 
 
   };
@@ -229,15 +229,15 @@ sub getSmartFieldType($){
   my($in) = shift;
   my($out)="";
   my($SmartType)= {
-    	"text"=>"Text",
-	"integer" =>"Integer",
-	"timestamp without time zone" =>"Date",
-	"timestamp with time zone" =>"Date",
-	"character"=>"Text",
-	"character varying"=>"Text",
-	"date"=>"Date"
-	,"double precision"=>"Double"
-	,"real"=>"Double"
+      "text"=>"Text",
+  "integer" =>"Integer",
+  "timestamp without time zone" =>"Date",
+  "timestamp with time zone" =>"Date",
+  "character"=>"Text",
+  "character varying"=>"Text",
+  "date"=>"Date"
+  ,"double precision"=>"Double"
+  ,"real"=>"Double"
 
   };
 $out =  $SmartType->{$in};
@@ -256,10 +256,10 @@ sub getGetMethod($$){
 
 
 sub ucf($){
-	return ucfirst(shift);
+  return ucfirst(shift);
 }
 sub lcf($){
-	return lcfirst(shift);
+  return lcfirst(shift);
 }
 sub getFileName($){
  my $path = shift;

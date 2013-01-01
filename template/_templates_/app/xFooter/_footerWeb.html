@@ -1,20 +1,24 @@
 <form>
-	<input type="text" name="historyTrackerId" id = "historyTrackierId" style="display:none;" >
+	<input type="text" name="historyTrackerId" id = "historyTrackerId" style="display:none;" >
 </form>
 <div id="EmptyDivId" class="LogicalHide"><!--dispatchercommon.html --> &nbsp; </div>
 <!--BUILDONLY_BEGIN-->
-<script type="text/javascript" src="../closure-library/closure/goog/base.js"></script>
-<script type="text/javascript" src="app.js"></script>
-<script type="text/javascript" src="webpages.js"></script>
+<script type="text/javascript" src="../closure-library/closure/goog/base.js"> </script>
+<script type="text/javascript" src="app-deps.js"> </script>
+
+
+
+<!--
+-->
 <!--BUILDONLY_END-->
 
-<script type="text/javascript" >
-	document.write(app.AppLogger.view.getPrimary());
-	app.initLogger();
-LoginWeb.init();
-AppLoggerWeb.init();
-MainLauncherWeb.init();
-app.initHistory();
+<script type="text/javascript" >goog.require('app');
+//	document.write(app.AppLogger.view.getPrimary());
+//	app.initLogger();
+//LoginWeb.init();
+//AppLoggerWeb.init();
+//MainLauncherWeb.init();
+//app.initHistory();
 </script>
 
 

@@ -4,12 +4,6 @@
 [%INCLUDE app/xHeader/_headerWeb.html%]
 <body> 
 [%-INCLUDE app/xFooter/_footerWeb.html-%]
-
-<script type="text/javascript">
-    // Exercise the .helloWorld template
-    document.write(app.Login.view.getPrimary());
-  </script>
-
 </body>
 </html>
 [%- END #filter -%]

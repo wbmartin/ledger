@@ -1,133 +1,133 @@
 <project name="ledger" default="build" basedir=".">
-	<description>
-		General Ledger Build
-	</description>
-	<property name="template.dir" value="${basedir}/template/_templates_"/>
-	<property name="templategen.dir" value="${basedir}/template/_gen_"/>
-	<property name="build.dir" value ="${basedir}/build/app"/>
-	<property name="deploy.dir" value="${basedir}/deploy"/>
-	<property name="closure.dir" value="${basedir}/build"/>
-	<property name="closure-library.dir" value="${closure.dir}/closure-library" />
-	<property name="closurecompiler.dir" value="/home/wbmartin/dev/closurecompiler"/>
-	<property name="soycompiler.dir" value="${closurecompiler.dir}"/>
-	<target name="generateTemplates">
-		<exec dir="${basedir}" executable="perl">
-			<arg value="generateTemplates.pl"/>
-			<arg value="${basedir}"/>
-		</exec>
-	</target>
+  <description>
+    General Ledger Build
+  </description>
+  <property name="template.dir" value="${basedir}/template/_templates_"/>
+  <property name="templategen.dir" value="${basedir}/template/_gen_"/>
+  <property name="build.dir" value ="${basedir}/build/app"/>
+  <property name="deploy.dir" value="${basedir}/deploy"/>
+  <property name="closure.dir" value="${basedir}/build"/>
+  <property name="closure-library.dir" value="${closure.dir}/closure-library" />
+  <property name="closurecompiler.dir" value="/home/wbmartin/dev/closurecompiler"/>
+  <property name="soycompiler.dir" value="${closurecompiler.dir}"/>
+  <target name="generateTemplates">
+    <exec dir="${basedir}" executable="perl">
+      <arg value="generateTemplates.pl"/>
+      <arg value="${basedir}"/>
+    </exec>
+  </target>
 
-	<target name="build-push">
-		<copy file="${templategen.dir}/index.html" todir="${build.dir}"/>
-		<copy file="${templategen.dir}/app.js" todir="${build.dir}"/>
-		<copy file="${templategen.dir}/webpages.js" todir="${build.dir}"/>
-		<copy file="${template.dir}/app/lib/soyutils_usegoog.js" todir="${build.dir}"/>
-	</target>
+  <target name="build-push">
+    <copy file="${templategen.dir}/index.html" todir="${build.dir}"/>
+    <copy file="${templategen.dir}/app.js" todir="${build.dir}"/>
+    <copy file="${templategen.dir}/webpages.js" todir="${build.dir}"/>
+    <copy file="${template.dir}/app/lib/soyutils.js" todir="${build.dir}"/>
+  </target>
 
-	<target name="build-soy">
-		<fileset id="soy.dir" dir="${templategen.dir}" includes="*.soy"/> 
-		<pathconvert pathsep=" --srcs " property="soyfiles" refid="soy.dir"/>
-		<echo message="${soyfiles}"/>
-		<exec executable="java">
-			<arg line="-jar ${soycompiler.dir}/SoyToJsSrcCompiler.jar"/>
-			<arg line="--outputPathFormat ${templategen.dir}/webpages.js"/>
-			<arg line="--shouldProvideRequireSoyNamespaces"/>
-			<arg line="--srcs ${soyfiles}"/>
-		</exec>
-		<copy file="${templategen.dir}/webpages.js" todir="${build.dir}"/>
-	</target>
+  <target name="build-soy">
+    <fileset id="soy.dir" dir="${templategen.dir}" includes="*.soy"/> 
+    <pathconvert pathsep=" --srcs " property="soyfiles" refid="soy.dir"/>
+    <echo message="${soyfiles}"/>
+    <exec executable="java">
+      <arg line="-jar ${soycompiler.dir}/SoyToJsSrcCompiler.jar"/>
+      <arg line="--outputPathFormat ${templategen.dir}/webpages.js"/>
+      <arg line="--shouldProvideRequireSoyNamespaces"/>
+      <arg line="--srcs ${soyfiles}"/>
+    </exec>
+    <copy file="${templategen.dir}/webpages.js" todir="${build.dir}"/>
+  </target>
 
-	<target name="init">
-		<!-- Create the time stamp -->
-		<tstamp/>
-	</target>
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+  </target>
 
-	<target name="build-clean">
-		<delete>
-			<fileset dir="${templategen.dir}"/>		
-		</delete>
-	</target>
+  <target name="build-clean">
+    <delete>
+      <fileset dir="${templategen.dir}"/>    
+    </delete>
+  </target>
 
-	<target name="build-postclean">
-		<echo>replacing tabs</echo>
-		<exec dir="${basedir}" executable="perl">
-			<arg value="-p -i -e 's/\t/ /g'"/>
-			<arg value="${templategen.dir}/app.js"/>
-			<arg value="${templategen.dir}/index.html"/>
-		</exec>
-		<echo>replacing EOL Whitespace</echo>
-		<exec dir="${basedir}" executable="perl">
-			<arg value="-p -i -e 's/[ \t]+$//g'"/>
-			<arg value="${templategen.dir}/app.js"/>
-			<arg value="${templategen.dir}/index.html"/>
-		</exec>
-		<echo>replacing redundant line breaks</echo>
-		<exec dir="${basedir}" executable="perl">
-			<arg value="-p -i -e 's/^\n//'"/>
-			<!-- alternate method s/\n\n/\n/smg -->
-			<arg value="${templategen.dir}/app.js"/>
-			<arg value="${templategen.dir}/index.html"/>
-		</exec>
-		<echo>replacing redundant spaces in html</echo>
-		<exec dir="${basedir}" executable="perl">
-			<arg value="-p -i -e 's/ +/ /g'"/>
-			<arg value="${templategen.dir}/index.html"/>
-		</exec>
-		<!--  Other Cleanups
+  <target name="build-postclean">
+    <echo>replacing tabs</echo>
+    <exec dir="${basedir}" executable="perl">
+      <arg value="-p -i -e 's/\t/ /g'"/>
+      <arg value="${templategen.dir}/app.js"/>
+      <arg value="${templategen.dir}/index.html"/>
+    </exec>
+    <echo>replacing EOL Whitespace</echo>
+    <exec dir="${basedir}" executable="perl">
+      <arg value="-p -i -e 's/[ \t]+$//g'"/>
+      <arg value="${templategen.dir}/app.js"/>
+      <arg value="${templategen.dir}/index.html"/>
+    </exec>
+    <echo>replacing redundant line breaks</echo>
+    <exec dir="${basedir}" executable="perl">
+      <arg value="-p -i -e 's/^\n//'"/>
+      <!-- alternate method s/\n\n/\n/smg -->
+      <arg value="${templategen.dir}/app.js"/>
+      <arg value="${templategen.dir}/index.html"/>
+    </exec>
+    <echo>replacing redundant spaces in html</echo>
+    <exec dir="${basedir}" executable="perl">
+      <arg value="-p -i -e 's/ +/ /g'"/>
+      <arg value="${templategen.dir}/index.html"/>
+    </exec>
+    <!--  Other Cleanups
 #tidy -m $templategen.dir/index.html;
 #probably want to use tidy -qe for quiet and errors.warnings only no markup changes
 #gjslint $templategen.dir/app.js;
-					-->
-	</target>
-	<target name="build" depends="init, build-clean">
-		<antcall target="generateTemplates"/>
-		<antcall target="build-soy"/>
-		<!--antcall target="build-postclean"/-->
-		<antcall target="build-push"/>
-	</target>
-	<target name="deploy" depends="init, deploy-clean">
-		<antcall target="deploy-push"/>
-		<exec dir="${basedir}" executable="perl">
-			<arg value="-pi"/>
-			<arg value="deploymod.pl"/>
-			<arg value="${deploy.dir}/index.html"/>
-		</exec>
-		<antcall target="deploy-compile"/>
-	</target>
+          -->
+  </target>
+  <target name="build" depends="init, build-clean">
+    <antcall target="generateTemplates"/>
+    <antcall target="build-soy"/>
+    <!--antcall target="build-postclean"/ -->
+    <antcall target="build-push"/>
+  </target>
+  <target name="deploy" depends="init, deploy-clean">
+    <antcall target="deploy-push"/>
+    <exec dir="${basedir}" executable="perl">
+      <arg value="-pi"/>
+      <arg value="deploymod.pl"/>
+      <arg value="${deploy.dir}/index.html"/>
+    </exec>
+    <antcall target="deploy-compile"/>
+  </target>
 
-	<target name="deploy-compile">
-		<exec executable="python" failonerror="true" logError="true" output="${deploy.dir}/app-compiled.js" >
-			<arg value="${closure-library.dir}/closure/bin/build/closurebuilder.py" />
-			<arg value='--root=${closure-library.dir}/'/>
-			<arg value='--root=${build.dir}/'/>
-			<arg line='--namespace="app"'/>
-			<arg line='--output_mode=compiled'/>
-			<arg line='--compiler_jar=${closurecompiler.dir}/compiler.jar'/>
-			<arg line='--compiler_flags="--compilation_level=ADVANCED_OPTIMIZATIONS"'/>
-			<arg line='--compiler_flags="--debug"'/>
-			<arg line='--compiler_flags="--formatting=pretty_print"'/>
-			<arg line='--compiler_flags="--warning_level=verbose"'/>
-		</exec>
-	</target>
+  <target name="deploy-compile">
+    <exec executable="python" failonerror="true" logError="true" output="${deploy.dir}/app-compiled.js" >
+      <arg value="${closure-library.dir}/closure/bin/build/closurebuilder.py" />
+      <arg value='--root=${closure-library.dir}/'/>
+      <arg value='--root=${build.dir}/'/>
+      <arg line='--namespace="app"'/>
+      <arg line='--output_mode=compiled'/>
+      <arg line='--compiler_jar=${closurecompiler.dir}/compiler.jar'/>
+      <arg line='--compiler_flags="--compilation_level=ADVANCED_OPTIMIZATIONS"'/>
+      <arg line='--compiler_flags="--debug"'/>
+      <arg line='--compiler_flags="--formatting=pretty_print"'/>
+      <arg line='--compiler_flags="--warning_level=verbose"'/>
+    </exec>
+  </target>
 
-	<target name="deploy-clean">
-		<delete>
-			<fileset dir="${deploy.dir}"/>
-		</delete>
-		<mkdir dir="${deploy.dir}/cgi-bin"/>
-		<mkdir dir="${deploy.dir}/images"/>
-	</target>
+  <target name="deploy-clean">
+    <delete>
+      <fileset dir="${deploy.dir}"/>
+    </delete>
+    <mkdir dir="${deploy.dir}/cgi-bin"/>
+    <mkdir dir="${deploy.dir}/images"/>
+  </target>
 
-	<target name="deploy-push" depends="deploy-clean">
-		<copy  todir="${deploy.dir}/cgi-bin">
-			<fileset dir ="${build.dir}/cgi-bin"/>
-		</copy>
-		<copy  todir="${deploy.dir}/images">
-			<fileset dir ="${build.dir}/images"/>
-		</copy>
-		<copy  todir="${deploy.dir}">
-			<fileset file="${build.dir}/index.html"/>
-		</copy>
-	</target>
+  <target name="deploy-push" depends="deploy-clean">
+    <copy  todir="${deploy.dir}/cgi-bin">
+      <fileset dir ="${build.dir}/cgi-bin"/>
+    </copy>
+    <copy  todir="${deploy.dir}/images">
+      <fileset dir ="${build.dir}/images"/>
+    </copy>
+    <copy  todir="${deploy.dir}">
+      <fileset file="${build.dir}/index.html"/>
+    </copy>
+  </target>
 
 </project>

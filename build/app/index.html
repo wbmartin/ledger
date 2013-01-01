@@ -1,22 +1,22 @@
 <!DOCType html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<meta charset="utf-8"/>
-	<script type="text/javascript">
-		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', 'UA-37053410-1']);
-		_gaq.push(['_setDomainName', 'martinanalytics.com']);
-		_gaq.push(['_trackPageview','InitialLoad']);
-		(function() {
-		 var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		 ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		 })();
-	 </script>
+  <meta charset="utf-8"/>
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-37053410-1']);
+    _gaq.push(['_setDomainName', 'martinanalytics.com']);
+    _gaq.push(['_trackPageview','InitialLoad']);
+    (function() {
+     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+     })();
+   </script>
 
 
-	 <style type="text/css">
-		 /* CSS Resets */
+   <style type="text/css">
+     /* CSS Resets */
 
 html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,address,cite,code,del,dfn,em,img,ins,q,small,strong,sub,sup,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{border:0;margin:0;padding:0}article,aside,figure,figure img,figcaption,hgroup,footer,header,nav,section,video,object{display:block}a img{border:0}figure{position:relative}figure img{width:100%}
 
@@ -146,7 +146,7 @@ img {
 	}
 
 }
-		 .SecurityDisabled{
+     .SecurityDisabled{
   display:none !important;
 }
 
@@ -245,7 +245,7 @@ background-position:-20px -180px;
 
 
 
-		 /* --------------------------------------------------------------
+     /* --------------------------------------------------------------
 http://www.blueprintcss.org/
    reset.css
    * Resets default browser CSS.
@@ -522,35 +522,33 @@ form.inline p { margin-bottom:0; }
 
 
 
-	 </style>
+   </style>
  </head>
 
 <body> <form>
-	<input type="text" name="historyTrackerId" id = "historyTrackierId" style="display:none;" >
+	<input type="text" name="historyTrackerId" id = "historyTrackerId" style="display:none;" >
 </form>
 <div id="EmptyDivId" class="LogicalHide"><!--dispatchercommon.html --> &nbsp; </div>
 <!--BUILDONLY_BEGIN-->
-<script type="text/javascript" src="../closure-library/closure/goog/base.js"></script>
-<script type="text/javascript" src="app.js"></script>
-<script type="text/javascript" src="webpages.js"></script>
+<script type="text/javascript" src="../closure-library/closure/goog/base.js"> </script>
+<script type="text/javascript" src="app-deps.js"> </script>
+
+
+
+<!--
+-->
 <!--BUILDONLY_END-->
 
-<script type="text/javascript" >
-	document.write(app.AppLogger.view.getPrimary());
-	app.initLogger();
-LoginWeb.init();
-AppLoggerWeb.init();
-MainLauncherWeb.init();
-app.initHistory();
+<script type="text/javascript" >goog.require('app');
+//	document.write(app.AppLogger.view.getPrimary());
+//	app.initLogger();
+//LoginWeb.init();
+//AppLoggerWeb.init();
+//MainLauncherWeb.init();
+//app.initHistory();
 </script>
 
 
  
-
-<script type="text/javascript">
-    // Exercise the .helloWorld template
-    document.write(app.Login.view.getPrimary());
-  </script>
-
 </body>
 </html>
