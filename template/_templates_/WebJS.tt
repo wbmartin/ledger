@@ -11,6 +11,7 @@ goog.require('goog.debug.FancyWindow');
 goog.require('goog.debug.Logger');
 goog.require('goog.dom');
 goog.require('goog.dom.classes');
+goog.require('goog.dom.forms');
 goog.require('goog.dom.query');
 goog.require('goog.events');
 goog.require('goog.events.EventHandler');

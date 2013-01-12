@@ -7,32 +7,12 @@ goog.provide('app.dispatch');
  *
  */
 goog.provide('app.GLOBAL');
-/** @type {string|undefined} */ app.GLOBAL.SESSION_ID = '';
+
+///** @type {string|undefined} */ app.GLOBAL.SESSION_ID = '';
+///** @type {string|undefined} */ app.GLOBAL.USER_ID = '';
+///** @type {string|undefined} */ app.GLOBAL.PRIMARY_URL = './cgi-bin/server.pl';
+///** @type {string|undefined} */ app.GLOBAL.METHOD = 'POST';
 /** @type {Array.<string>} */ app.GLOBAL.currentDisplayDivs = new Array();
-
-
-/**
- *SRC:[%SRC_LOC %]
- */ 
-[%f='initLogger'%]
-app.[%f%] = function() {
-  /** @type {goog.debug.Logger.Level} */
-  app.GLOBAL.LOG_LEVEL = goog.debug.Logger.Level.ALL;
-  if (LL.ON) {
-    var logconsole = 
-      new goog.debug.DivConsole(goog.dom.getElement('loggerConsole'));
-    logconsole.setCapturing(true);
-    app.logger = goog.debug.Logger.getLogger('app');
-    app.logger.setLevel(app.GLOBAL.LOG_LEVEL);
-  }
-  if (LL.INFO) app.logger.info('[%f%] Initialized');
-
-  //app.debugWindow = new goog.debug.FancyWindow('main');
-  //    app.debugWindow.setEnabgoog.debug.Logger.Level.ALLled(true);
-  //    app.debugWindow.init();
-
-};
-goog.exportSymbol('app.initLogger', app.initLogger);
 
 /**
  * target page after login unless changed later
@@ -57,61 +37,6 @@ app.[%f%] = function(cmdParams, completeCallBack) {
 };
 
 
-/**
- *
- * SRC: [%SRC_LOC%]
- * @constructor
- * @param {string} resource_ usually the table name.
- * @param {string} action_ usually the CRUD operation. 
- */ 
-app.Command = function(resource_, action_) {
-  /** @type {string}*/
-  this['spwfResource'] = resource_;
-  /** @type {string}*/
-  this['spwfAction'] = action_;
-};
-
-goog.provide('app.form');
-/**
- * SRC: [%SRC_LOC%]
- * @param {string} formId_  id of the form to grab all inputs.
- * @return {Object} form data.
- */
-[%f='form.getValues'%]
-app.[%f%] = function(formId_) {
-  if (LL.FINEST) {
-    app.logger.finest('Call: [%f%] - ' + formId_);
-  }
-  /** @type {Object}*/
-  var formValues = {};
-  /** @type {{length: number}} */
-  var input = new Array();
-  input = goog.dom.query('#' + formId_ + ' input');
-  /** @type {string}*/
-  var fieldName;
-  for (var i = 0; i < input.length; i++) {
-    fieldName = input[i].id.replace((formId_ + '-'), '');
-    formValues[fieldName] = input[i].value;
-  }
-  if (LL.FINEST) {
-    app.logger.finest('[%f%] result ' + goog.debug.expose(formValues));
-  }
-
-  return formValues;
-};
-
-/**
- *
- * SRC: [%SRC_LOC%]
- * @param {Object} ee the digestee.
- */
-app.Command.prototype.digest = function(ee) {
-  /** @type {string} */
-  var key;
-  for (key in ee) {
-    this[key] = ee[key];
-  }
-};
 
 
 
@@ -178,28 +103,6 @@ app.[%f%] = function(target_) {
     return true;
   }
 };
-/**
- *
- * This is a very delicate function.  
- * The call must come from a body script before the page finishes loading
- * If there is every problems with navigation, it is probably here.
- * SRC: [%SRC_LOC%]
- * @return {goog.History} the history object.
- */ 
-app.initHistory = function() {
-  /** 
-   *This input is located in _footerWeb.html
-   * @type {HTMLInputElement} 
- */
-  var trackingElement = /** @type {HTMLInputElement} */
-    (goog.dom.getElement('historyTrackerId'));
-  app.hist = new goog.History(false, undefined, trackingElement);
-
-  goog.events.listen(app.hist, goog.history.EventType.NAVIGATE, app.navCallback);
-  app.hist.setEnabled(true);
-  return app.hist;
-};
-goog.exportSymbol('app.initHistory', app.initHistory);
 
 
 /**
@@ -228,7 +131,8 @@ app.[%f%] = function(session_) {
   if (LL.FINEST) {
     app.logger.finest('[%f%] called: ' + session_);
   }
-  app.GLOBAL.SESSION_ID = session_;
+  //app.GLOBAL.SESSION_ID = session_;
+  //app.GLOBAL.USER_ID = goog.dom.getElement('LoginForm-user_id').value;
   goog.net.cookies.set('session_id', session_);
   goog.net.cookies.set('user_id', 
       goog.dom.getElement('LoginForm-user_id').value);
@@ -246,9 +150,11 @@ app.[%f%] = function() {
     app.logger.finest('[%f%] called: ');
   }
 
-  var cmdParams = new app.Command('KEEP_ALIVE', 'AUTHENTICATE');
-  cmdParams['user_id'] = goog.net.cookies.get('user_id');
-  cmdParams['session_id'] = goog.net.cookies.get('session_id');
+  var qd = new goog.Uri.QueryData('=KEEP_ALIVE&=AUTHENTICATE');
+  qd.add('spwfResource', 'KEEP_ALIVE');
+  qd.add('spwfAction', 'AUTHENTICATE');
+  qd.add('user_id', goog.net.cookies.get('user_id'));
+  qd.add('session_id', goog.net.cookies.get('session_id'));
 
   /** @type {function({goog.events.Event})} */
   var callBack;
@@ -266,8 +172,8 @@ app.[%f%] = function() {
     }
 
   };
-  app.server.cmdCall(cmdParams, callBack);
-
+  
+  app.svrCall(callBack, qd.toString());
 };
 /**
  *
@@ -279,7 +185,6 @@ var nz = function(val_, ifnull_) {
   if (val_ == undefined || val_ == null) return ifnull_;
   return val_;
 };
-goog.exportSymbol('nz', nz);
 
 goog.provide('app.dispatcher');
 /**
@@ -311,3 +216,67 @@ app.[%f%] = function(request_) {
     app.dispatch[urlData.path_](qdObject);
   }
 };
+/**
+*
+* @param {string} resource resource to operate.
+* @param {string} action action to take.
+* @param {string} form  name of the form.
+* @return {string} the built query string.
+*/
+app.buildQDStrForm = function (resource, action, form) {
+  /** @type {string} */
+  var qstr = goog.dom.forms.getFormDataString(goog.dom.getElement(form));
+  var qd = new goog.Uri.QueryData(qstr);
+  qd.add('spwfResource', resource);
+  qd.add('spwfAction', action);
+  //if (action !== 'AUTHENTICATE') {
+  //  qd.add('user_id', app.GLOBAL.USER_ID);
+  //  qd.add('session_id', app.GLOBAL.SESSION_ID);
+ //}
+  if (LL.FINEST) {
+    app.logger.finest('Server Call Built' + qstr.toString());
+  }
+  return qd.toString();
+}
+
+/**
+*
+*/
+app.init = function (){
+ /** @type {goog.debug.Logger.Level} */
+  app.GLOBAL.LOG_LEVEL = goog.debug.Logger.Level.ALL;
+  if (LL.ON) {
+    var logconsole = 
+      new goog.debug.DivConsole(goog.dom.getElement('loggerConsole'));
+    logconsole.setCapturing(true);
+    app.logger = goog.debug.Logger.getLogger('app');
+    app.logger.setLevel(app.GLOBAL.LOG_LEVEL);
+  }
+  if (LL.INFO) app.logger.info('[%f%] Initialized');
+
+  //app.debugWindow = new goog.debug.FancyWindow('main');
+  //    app.debugWindow.setEnabgoog.debug.Logger.Level.ALLled(true);
+  //    app.debugWindow.init();
+
+//This input is located in _footerWeb.html
+   /** @type {HTMLInputElement} */
+  var trackingElement = /** @type {HTMLInputElement} */
+    (goog.dom.getElement('historyTrackerId'));
+  app.hist = new goog.History(false, undefined, trackingElement);
+  goog.events.listen(app.hist, goog.history.EventType.NAVIGATE, app.navCallback);
+  app.hist.setEnabled(true);
+
+}
+
+/**
+*
+*/
+app.setMainContent = function(contentBlock) {
+  goog.dom.getElement('mainContent').innerHTML = contentBlock;
+};
+
+app.svrCall = function(callBack, qdstr) {
+  goog.net.XhrIo.send('./cgi-bin/server.pl', callBack, 'POST', qdstr);
+};
+
+

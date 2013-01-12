@@ -15,7 +15,11 @@ Main:{
 	print header('application/json');
 	$params = Vars;
 	$params = &UTL::parseParams($params);# export form values ensures that you also get multi-value <select>s as separate values. too.
-	&UTL::dbConnect(\$dbh );
+  if (!exists $params->{'user_id'}) {#get userid and session from cookie, unless login
+	  $params->{'user_id'} = $cgi->cookie('user_id');
+	  $params->{'session_id'} = $cgi->cookie('session_id');
+  }
+  &UTL::dbConnect(\$dbh );
 $sth = &buildSTH($dbh, $params );
 
 if(ref($sth))  {#if we have a successful connection and statement built, execute it, iterate over result set, package and return

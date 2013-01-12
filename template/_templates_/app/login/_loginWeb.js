@@ -16,7 +16,6 @@ goog.provide('LoginWeb');
     [%divId%]Web.logger.info('Initialized');
   }
 };
-goog.exportSymbol('[%divId%]Web.init', [%divId%]Web.init);
 /**
  *  SRC: [% SRC_LOC%]
  */ 
@@ -24,9 +23,10 @@ goog.exportSymbol('[%divId%]Web.init', [%divId%]Web.init);
   if (LL.FINEST) {
     [%divId%]Web.logger.finest('Call start');
   }
-  /** @type {app.Command} */
-  var cmdParams = new app.Command('SECURITY_USER', 'AUTHENTICATE');
-  cmdParams.digest(app.form.getValues('[%divId%]Form'));
+   
+	/** @type {string} */
+	var qstr = app.buildQDStrForm('SECURITY_USER', 'AUTHENTICATE', 'LoginForm');
+	 
   /** @type {function({goog.events.Event})} */
   var callBack;
   callBack = function(e) {
@@ -36,10 +36,13 @@ goog.exportSymbol('[%divId%]Web.init', [%divId%]Web.init);
     var session = obj['rows'][0]['session_id'];
     LoginWeb.onSuccessfulLogin(session);
   };
-  app.server.cmdCall(cmdParams, callBack);
+	/** @type {goog.net.XhrIo}*/
+  //var xhr = new goog.net.XhrIo();
+	//goog.events.listen(xhr, goog.net.EventType.COMPLETE, callBack);
+	//xhr.send('./cgi-bin/server.pl', 'POST', qstr);
+	app.svrCall(callBack, qstr);
 
 };
-goog.exportSymbol('[%divId%]Web.start', [%divId%]Web.start);
 
 [%f='onSuccessfulLogin'%]
 /**
@@ -49,7 +52,6 @@ goog.exportSymbol('[%divId%]Web.start', [%divId%]Web.start);
 [%divId%]Web.[%f%] = function(session_) {
   [%divId%]Web.logger.finest('Call [%f%]');
   app.standardSuccessfulLogin(session_);
-
 };
 
 /**

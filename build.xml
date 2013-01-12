@@ -21,7 +21,7 @@
     <copy file="${templategen.dir}/index.html" todir="${build.dir}"/>
     <copy file="${templategen.dir}/app.js" todir="${build.dir}"/>
     <copy file="${templategen.dir}/webpages.js" todir="${build.dir}"/>
-    <copy file="${template.dir}/app/lib/soyutils.js" todir="${build.dir}"/>
+    <copy file="${template.dir}/app/lib/soyutils_usegoog.js" todir="${build.dir}"/>
   </target>
 
   <target name="build-soy">
@@ -78,56 +78,85 @@
 #probably want to use tidy -qe for quiet and errors.warnings only no markup changes
 #gjslint $templategen.dir/app.js;
           -->
-  </target>
-  <target name="build" depends="init, build-clean">
-    <antcall target="generateTemplates"/>
-    <antcall target="build-soy"/>
-    <!--antcall target="build-postclean"/ -->
-    <antcall target="build-push"/>
-  </target>
-  <target name="deploy" depends="init, deploy-clean">
-    <antcall target="deploy-push"/>
-    <exec dir="${basedir}" executable="perl">
-      <arg value="-pi"/>
-      <arg value="deploymod.pl"/>
-      <arg value="${deploy.dir}/index.html"/>
-    </exec>
-    <antcall target="deploy-compile"/>
-  </target>
 
-  <target name="deploy-compile">
-    <exec executable="python" failonerror="true" logError="true" output="${deploy.dir}/app-compiled.js" >
-      <arg value="${closure-library.dir}/closure/bin/build/closurebuilder.py" />
-      <arg value='--root=${closure-library.dir}/'/>
-      <arg value='--root=${build.dir}/'/>
-      <arg line='--namespace="app"'/>
-      <arg line='--output_mode=compiled'/>
-      <arg line='--compiler_jar=${closurecompiler.dir}/compiler.jar'/>
-      <arg line='--compiler_flags="--compilation_level=ADVANCED_OPTIMIZATIONS"'/>
-      <arg line='--compiler_flags="--debug"'/>
-      <arg line='--compiler_flags="--formatting=pretty_print"'/>
-      <arg line='--compiler_flags="--warning_level=verbose"'/>
-    </exec>
-  </target>
+</target>
 
-  <target name="deploy-clean">
-    <delete>
-      <fileset dir="${deploy.dir}"/>
-    </delete>
-    <mkdir dir="${deploy.dir}/cgi-bin"/>
-    <mkdir dir="${deploy.dir}/images"/>
-  </target>
+<target name="build-debug-deps">
+  <delete>
+    <fileset file="${build.dir}/app-deps.js"/>
+  </delete>
+  <exec dir="${basedir}" executable="python" >
+    <arg line="${closure-library.dir}/closure/bin/build/depswriter.py"/>
+    <arg line="--root_with_prefix='${build.dir} ../../../app'"/>
+    <arg line="--output_file='${build.dir}/app-deps.js'"/>
+  </exec>
+</target>    
 
-  <target name="deploy-push" depends="deploy-clean">
-    <copy  todir="${deploy.dir}/cgi-bin">
-      <fileset dir ="${build.dir}/cgi-bin"/>
-    </copy>
-    <copy  todir="${deploy.dir}/images">
-      <fileset dir ="${build.dir}/images"/>
-    </copy>
-    <copy  todir="${deploy.dir}">
-      <fileset file="${build.dir}/index.html"/>
-    </copy>
-  </target>
+<target name="build" depends="init, build-clean">
+  <antcall target="generateTemplates"/>
+  <antcall target="build-soy"/>
+  <!--antcall target="build-postclean"/ -->
+  <antcall target="build-push"/>
+</target>
+<target name="deploy" depends="init, deploy-clean">
+  <antcall target="deploy-push"/>
+  <exec dir="${basedir}" executable="perl">
+    <arg value="-pi"/>
+    <arg value="deploymod.pl"/>
+    <arg value="${deploy.dir}/index.html"/>
+  </exec>
+  <antcall target="deploy-compile"/>
+</target>
+
+<target name="deploy-compile">
+  <exec executable="python" failonerror="true" logError="true" output="${deploy.dir}/app-compiled.js" >
+    <arg value="${closure-library.dir}/closure/bin/build/closurebuilder.py" />
+    <arg value='--root=${closure-library.dir}/'/>
+    <arg value='--root=${build.dir}/'/>
+    <arg line='--namespace="app"'/>
+    <arg line='--output_mode=compiled'/>
+    <arg line='--compiler_jar=${closurecompiler.dir}/compiler.jar'/>
+    <arg line='--compiler_flags="--compilation_level=ADVANCED_OPTIMIZATIONS"'/>
+    <arg line='--compiler_flags="--debug"'/>
+    <arg line='--compiler_flags="--formatting=pretty_print"'/>
+    <arg line='--compiler_flags="--warning_level=verbose"'/>
+  </exec>
+</target>
+
+<target name="deploy-clean">
+  <delete>
+    <fileset dir="${deploy.dir}"/>
+  </delete>
+  <mkdir dir="${deploy.dir}/cgi-bin"/>
+  <mkdir dir="${deploy.dir}/images"/>
+</target>
+
+<target name="deploy-push" depends="deploy-clean">
+  <copy  todir="${deploy.dir}/cgi-bin">
+    <fileset dir ="${build.dir}/cgi-bin"/>
+  </copy>
+  <copy  todir="${deploy.dir}/images">
+    <fileset dir ="${build.dir}/images"/>
+  </copy>
+  <copy  todir="${deploy.dir}">
+    <fileset file="${build.dir}/index.html"/>
+  </copy>
+</target>
+<!--
+<target name="src-cleanup">
+  <foreach name="test" target="simple" param="the_file"> 
+    <path>
+      <fileset dir="${template.dir}">
+      </fileset>
+    </path>
+
+
+  </foreach>
+</target>
+
+<target name="simple">
+  <echo message="${the_file}"/>
+</target>
+-->
 
 </project>
