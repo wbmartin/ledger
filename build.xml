@@ -48,6 +48,25 @@
     </delete>
   </target>
 
+  <target name="cleansource">
+         <fileset id="srcjs" dir="${template.dir}/app/" > 
+      <include name ="**/*.js"/>
+    </fileset>
+    <pathconvert pathsep=" " property="jsfiles" refid="srcjs"/>
+    <echo message="${jsfiles}"/>
+    <exec dir="${basedir}" executable="perl">
+      <arg line="-p -i -e 's/[\t]+/  /g'"/>
+      <arg line="${jsfiles}"/>
+    </exec>
+    <exec dir="${basedir}" executable="perl">
+      <arg line="-p -i -e 's/[ \t]+$//g'"/>
+      <arg line="${jsfiles}"/>
+    </exec>
+
+
+
+  </target>
+
   <target name="build-postclean">
     <echo>replacing tabs</echo>
     <exec dir="${basedir}" executable="perl">

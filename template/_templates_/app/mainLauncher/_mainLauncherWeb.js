@@ -6,15 +6,16 @@ goog.provide('[%divId%]Web');
  * SRC: [%SRC_LOC%]
  * @param {Object} args_ the args to pass to the show function.
  *
- */ 
+ */
 [%divId%]Web.show = function(args_) {
-  app.standardShowPage('[%divId%]');
+  //app.standardShowPage('[%divId%]');
+  app.setMainContent(MainLauncher.view.getPrimary(null, null));
 };
 
 
 
 /**
- * SRC:[%SRC_LOC%] 
+ * SRC:[%SRC_LOC%]
  *
  */
 [%divId%]Web.init = function() {
@@ -26,4 +27,4 @@ goog.provide('[%divId%]Web');
 
   app.dispatch['[%divId%]'] = [%divId%]Web.show;
 };
-goog.exportSymbol('[%divId%]Web.init', [%divId%]Web.init);
+[%divId%]Web.init();

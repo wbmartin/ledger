@@ -1,7 +1,6 @@
 [%divId="AppLogger"%]
 [%SRC_LOC = 'appLogWeb.js'%]
 goog.provide('[%divId%]Web');
-goog.exportSymbol('app.[%divId%].view.getPrimary', app.[%divId%].view.getPrimary);
 /**
  * SRC: [%SRC_LOC%]
  * @param {Object} args_ rendering arguments.
@@ -14,7 +13,7 @@ goog.exportSymbol('app.[%divId%].view.getPrimary', app.[%divId%].view.getPrimary
   app.standardShowPage('[%divId%]');
 };
 /**
- * SRC:[%SRC_LOC%] 
+ * SRC:[%SRC_LOC%]
  *
  */
 [%divId%]Web.init = function() {
@@ -26,4 +25,3 @@ goog.exportSymbol('app.[%divId%].view.getPrimary', app.[%divId%].view.getPrimary
   [%divId%]Web.divId = '[%divId%]';
   app.dispatch['[%divId%]'] = [%divId%]Web.show;
 };
-goog.exportSymbol('[%divId%]Web.init', [%divId%]Web.init);
