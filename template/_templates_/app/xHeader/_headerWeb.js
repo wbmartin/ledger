@@ -43,27 +43,6 @@ app.GLOBAL.TARGET_PAGE = 'MainLauncher';
 
 /**
  * SRC: [%SRC_LOC%]
- * @param {app.Command} cmdParams Parameters to construct the server side call.
- * @param {function({goog.events.Event})} completeCallBack function.
- */
-//[%f='server.cmdCall'%]
-//app.[%f%] = function(cmdParams, completeCallBack) {
-//  if (LL.FINEST) {
-//  app.logger.finest('Call: [%f%] ' +
-//  goog.debug.expose(cmdParams));
-//  }
-//  /** @type {goog.net.XhrIo}*/
-//  var xhr = new goog.net.XhrIo();
-//  goog.events.listen(xhr, goog.net.EventType.COMPLETE, completeCallBack);
-//  xhr.send('./cgi-bin/server.pl', 'POST', goog.json.serialize(cmdParams));
-//};
-
-
-
-
-
-/**
- * SRC: [%SRC_LOC%]
  * Hide all other divs and show the new one.
  * @param {string} divToShow_  the div to show.
  * @return {boolean} false if exiting early.
@@ -96,6 +75,8 @@ app.[%f%] = function(divToShow_) {
 app.navCallback = function(e) {
   if (app.authenticate(e.token)) {
   app.dispatcher(e.token);
+  } else{
+  LoginWeb.show(null);
   }
 };
 
@@ -110,9 +91,14 @@ app.[%f%] = function(target_) {
   app.logger.finest('[%f%] called: ' + target_);
   }
 
-  if (app.GLOBAL.SESSION_ID === 'PENDING') return false;
-  if (app.GLOBAL.SESSION_ID == '') {
+
   app.GLOBAL.TARGET_PAGE = (target_ == '') ? 'MainLauncher' : target_;
+  if (goog.net.cookies.get('session_id') == undefined){
+
+  return false;
+  }
+  return true;
+/*  if (app.GLOBAL.SESSION_ID == '') {
   app.GLOBAL.SESSION_ID = 'PENDING';
   app.hist.setToken('');
   if (goog.net.cookies.get('user_id') != undefined) {
@@ -124,6 +110,7 @@ app.[%f%] = function(target_) {
   } else {
   return true;
   }
+  */
 };
 
 
@@ -135,8 +122,8 @@ app.[%f%] = function(target_) {
 app.[%f%] = function(page_) {
   if (LL.FINEST) {app.logger.finest('[%f%] called:' + page_);}
   app.hist.setToken(page_);
+  return false;
 };
-goog.exportSymbol('app.showPage', app.showPage);
 
 
 /**
@@ -271,7 +258,12 @@ app.init = function() {
   //    app.debugWindow.setEnabgoog.debug.Logger.Level.ALLled(true);
   //    app.debugWindow.init();
 
-  //This input is located in _footerWeb.html
+
+};
+app.init();
+
+app.initHistory = function () {
+//This input is located in _footerWeb.html
   /** @type {HTMLInputElement} */
   var trackingElement = /** @type {HTMLInputElement} */
   (goog.dom.getElement('historyTrackerId'));
@@ -281,8 +273,7 @@ app.init = function() {
   app.navCallback);
   app.hist.setEnabled(true);
 
-};
-app.init();
+}
 
 /**
  * SRC: [%SRC_LOC%]
@@ -298,11 +289,13 @@ app.setMainContent = function(contentBlock) {
  * @param {string} qdstr query data string.
  */
 app.svrCall = function(callBack, qdstr) {
-  var xhr = new goog.net.XhrIo();
-  goog.events.listen(xhr, goog.net.EventType.COMPLETE, callBack);
-  xhr.send('./cgi-bin/server.pl', 'POST', qdstr);
-  //goog.net.XhrIo.send('./cgi-bin/server.pl', callBack, 'POST', qdstr);
+  //var xhr = new goog.net.XhrIo();
+  //goog.events.listen(xhr, goog.net.EventType.COMPLETE, callBack);
+  //xhr.send('./cgi-bin/server.pl', 'POST', qdstr);
+  goog.net.XhrIo.send('./cgi-bin/server.pl', callBack, 'POST', qdstr);
 };
+
+
 
 
 

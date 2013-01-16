@@ -3,7 +3,6 @@
 'use strict';
 
 goog.require('AppLogger.view');
-goog.require('Login.view');
 goog.require('MainLauncher.view');
 goog.require('goog.History');
 goog.require('goog.Uri');

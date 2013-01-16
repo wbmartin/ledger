@@ -2,9 +2,7 @@
 /**
  *SRC: [SRCLOC]
  */
-var init = function() {
-  LoginWeb.show(null);
-  goog.dom.getElement('LoginForm-user_id').value = 'ledger';
-  goog.dom.getElement('LoginForm-password').value = 'ledger';
+var masterInit = function() {
+  app.initHistory();
 };
-init();
+masterInit();

@@ -8,7 +8,7 @@ goog.provide('LoginWeb');
  */
 [%divId%]Web.start = function() {
   if (LL.FINEST) {
-    [%divId%]Web.logger.finest('Call start');
+  [%divId%]Web.logger.finest('Call start');
   }
   app.GLOBAL.TRUSTED_DEVICE =
   goog.dom.getElement('LoginForm-trustedDeviceId').checked;
@@ -18,11 +18,11 @@ goog.provide('LoginWeb');
   /** @type {function({goog.events.Event})} */
   var callBack;
   callBack = function(e) {
-    [%divId%]Web.logger.finest('CallBack: Login Request ');
-    /** @type {Object} */
-    var obj = e.target.getResponseJson();
-    var session = obj['rows'][0]['session_id'];
-    LoginWeb.onSuccessfulLogin(session);
+  [%divId%]Web.logger.finest('CallBack: Login Request ');
+  /** @type {Object} */
+  var obj = e.target.getResponseJson();
+  var session = obj['rows'][0]['session_id'];
+  LoginWeb.onSuccessfulLogin(session);
   };
   app.svrCall(callBack, qstr);
   return false;
@@ -50,6 +50,13 @@ goog.provide('LoginWeb');
   [%divId%]Web.start
   );
 
+	goog.events.listen(
+  goog.dom.getElement('cmdlogin'),
+  goog.events.EventType.CLICK,
+  [%divId%]Web.start
+  );
+
+
 };
 
 
@@ -59,12 +66,12 @@ goog.provide('LoginWeb');
  */
 [%divId%]Web.init = function() {
   if (LL.ON) {
-    [%divId%]Web.logger = goog.debug.Logger.getLogger('[%divId%]');
-    [%divId%]Web.logger.setLevel(app.GLOBAL.LOG_LEVEL);
+  [%divId%]Web.logger = goog.debug.Logger.getLogger('[%divId%]');
+  [%divId%]Web.logger.setLevel(app.GLOBAL.LOG_LEVEL);
   }
   if (LL.INFO) { [%divId%]Web.logger.info('Initialized'); }
 
 
 };
 [%divId%]Web.init();
-
+goog.require('Login.view');

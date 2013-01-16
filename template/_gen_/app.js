@@ -1,7 +1,6 @@
 'use strict';
 
 goog.require('AppLogger.view');
-goog.require('Login.view');
 goog.require('MainLauncher.view');
 goog.require('goog.History');
 goog.require('goog.Uri');
@@ -71,27 +70,6 @@ app.GLOBAL.TARGET_PAGE = 'MainLauncher';
 
 /**
  * SRC: _headerWeb.js
- * @param {app.Command} cmdParams Parameters to construct the server side call.
- * @param {function({goog.events.Event})} completeCallBack function.
- */
-//
-//app.server.cmdCall = function(cmdParams, completeCallBack) {
-//  if (LL.FINEST) {
-//  app.logger.finest('Call: server.cmdCall ' +
-//  goog.debug.expose(cmdParams));
-//  }
-//  /** @type {goog.net.XhrIo}*/
-//  var xhr = new goog.net.XhrIo();
-//  goog.events.listen(xhr, goog.net.EventType.COMPLETE, completeCallBack);
-//  xhr.send('./cgi-bin/server.pl', 'POST', goog.json.serialize(cmdParams));
-//};
-
-
-
-
-
-/**
- * SRC: _headerWeb.js
  * Hide all other divs and show the new one.
  * @param {string} divToShow_  the div to show.
  * @return {boolean} false if exiting early.
@@ -124,6 +102,8 @@ app.standardShowPage = function(divToShow_) {
 app.navCallback = function(e) {
   if (app.authenticate(e.token)) {
   app.dispatcher(e.token);
+  } else{
+  LoginWeb.show(null);
   }
 };
 
@@ -138,9 +118,14 @@ app.authenticate = function(target_) {
   app.logger.finest('authenticate called: ' + target_);
   }
 
-  if (app.GLOBAL.SESSION_ID === 'PENDING') return false;
-  if (app.GLOBAL.SESSION_ID == '') {
+
   app.GLOBAL.TARGET_PAGE = (target_ == '') ? 'MainLauncher' : target_;
+  if (goog.net.cookies.get('session_id') == undefined){
+
+  return false;
+  }
+  return true;
+/*  if (app.GLOBAL.SESSION_ID == '') {
   app.GLOBAL.SESSION_ID = 'PENDING';
   app.hist.setToken('');
   if (goog.net.cookies.get('user_id') != undefined) {
@@ -152,6 +137,7 @@ app.authenticate = function(target_) {
   } else {
   return true;
   }
+  */
 };
 
 
@@ -163,8 +149,8 @@ app.authenticate = function(target_) {
 app.showPage = function(page_) {
   if (LL.FINEST) {app.logger.finest('showPage called:' + page_);}
   app.hist.setToken(page_);
+  return false;
 };
-goog.exportSymbol('app.showPage', app.showPage);
 
 
 /**
@@ -299,7 +285,12 @@ app.init = function() {
   //    app.debugWindow.setEnabgoog.debug.Logger.Level.ALLled(true);
   //    app.debugWindow.init();
 
-  //This input is located in _footerWeb.html
+
+};
+app.init();
+
+app.initHistory = function () {
+//This input is located in _footerWeb.html
   /** @type {HTMLInputElement} */
   var trackingElement = /** @type {HTMLInputElement} */
   (goog.dom.getElement('historyTrackerId'));
@@ -309,8 +300,7 @@ app.init = function() {
   app.navCallback);
   app.hist.setEnabled(true);
 
-};
-app.init();
+}
 
 /**
  * SRC: _headerWeb.js
@@ -326,15 +316,49 @@ app.setMainContent = function(contentBlock) {
  * @param {string} qdstr query data string.
  */
 app.svrCall = function(callBack, qdstr) {
-  var xhr = new goog.net.XhrIo();
-  goog.events.listen(xhr, goog.net.EventType.COMPLETE, callBack);
-  xhr.send('./cgi-bin/server.pl', 'POST', qdstr);
-  //goog.net.XhrIo.send('./cgi-bin/server.pl', callBack, 'POST', qdstr);
+  //var xhr = new goog.net.XhrIo();
+  //goog.events.listen(xhr, goog.net.EventType.COMPLETE, callBack);
+  //xhr.send('./cgi-bin/server.pl', 'POST', qdstr);
+  goog.net.XhrIo.send('./cgi-bin/server.pl', callBack, 'POST', qdstr);
 };
 
 
 
 
+
+
+
+
+
+goog.provide('HelpLauncherWeb');
+/**
+ * SRC: _helpLauncherWeb.js
+ * @param {Object} args_ the args to pass to the show function.
+ *
+ */
+HelpLauncherWeb.show = function(args_) {
+  //app.standardShowPage('HelpLauncher');
+  app.setMainContent(HelpLauncher.view.getPrimary(null, null));
+};
+
+
+
+/**
+ * SRC:_helpLauncherWeb.js
+ *
+ */
+HelpLauncherWeb.init = function() {
+  if (LL.ON) {
+    HelpLauncherWeb.logger = goog.debug.Logger.getLogger('HelpLauncher');
+    HelpLauncherWeb.logger.setLevel(app.GLOBAL.LOG_LEVEL);
+  }
+  if (LL.INFO) HelpLauncherWeb.logger.info('Initialized');
+
+  app.dispatch['HelpLauncher'] = HelpLauncherWeb.show;
+
+};
+HelpLauncherWeb.init();
+goog.require('HelpLauncher.view');
 
 
 goog.provide('LoginWeb');
@@ -345,7 +369,7 @@ goog.provide('LoginWeb');
  */
 LoginWeb.start = function() {
   if (LL.FINEST) {
-    LoginWeb.logger.finest('Call start');
+  LoginWeb.logger.finest('Call start');
   }
   app.GLOBAL.TRUSTED_DEVICE =
   goog.dom.getElement('LoginForm-trustedDeviceId').checked;
@@ -355,11 +379,11 @@ LoginWeb.start = function() {
   /** @type {function({goog.events.Event})} */
   var callBack;
   callBack = function(e) {
-    LoginWeb.logger.finest('CallBack: Login Request ');
-    /** @type {Object} */
-    var obj = e.target.getResponseJson();
-    var session = obj['rows'][0]['session_id'];
-    LoginWeb.onSuccessfulLogin(session);
+  LoginWeb.logger.finest('CallBack: Login Request ');
+  /** @type {Object} */
+  var obj = e.target.getResponseJson();
+  var session = obj['rows'][0]['session_id'];
+  LoginWeb.onSuccessfulLogin(session);
   };
   app.svrCall(callBack, qstr);
   return false;
@@ -387,6 +411,13 @@ LoginWeb.show = function(args_) {
   LoginWeb.start
   );
 
+	goog.events.listen(
+  goog.dom.getElement('cmdlogin'),
+  goog.events.EventType.CLICK,
+  LoginWeb.start
+  );
+
+
 };
 
 
@@ -396,15 +427,15 @@ LoginWeb.show = function(args_) {
  */
 LoginWeb.init = function() {
   if (LL.ON) {
-    LoginWeb.logger = goog.debug.Logger.getLogger('Login');
-    LoginWeb.logger.setLevel(app.GLOBAL.LOG_LEVEL);
+  LoginWeb.logger = goog.debug.Logger.getLogger('Login');
+  LoginWeb.logger.setLevel(app.GLOBAL.LOG_LEVEL);
   }
   if (LL.INFO) { LoginWeb.logger.info('Initialized'); }
 
 
 };
 LoginWeb.init();
-
+goog.require('Login.view');
 
 
 goog.provide('AppLoggerWeb');
@@ -450,9 +481,14 @@ goog.provide('MainLauncherWeb');
 MainLauncherWeb.show = function(args_) {
   //app.standardShowPage('MainLauncher');
   app.setMainContent(MainLauncher.view.getPrimary(null, null));
+
+    goog.events.listen(
+  goog.dom.getElement('launcherShowHelp'),
+  goog.events.EventType.CLICK,
+  goog.partial(app.showPage, "HelpLauncher")
+  );
+
 };
-
-
 
 /**
  * SRC:_mainLauncherWeb.js
@@ -486,9 +522,7 @@ return val_;
 /**
  *SRC: [SRCLOC]
  */
-var init = function() {
-  LoginWeb.show(null);
-  goog.dom.getElement('LoginForm-user_id').value = 'ledger';
-  goog.dom.getElement('LoginForm-password').value = 'ledger';
+var masterInit = function() {
+  app.initHistory();
 };
-init();
+masterInit();

@@ -1,5 +1,5 @@
-[%divId="MainLauncher"%]
-[%SRC_LOC="_mainLauncherWeb.js"%]
+[%divId="HelpLauncher"%]
+[%SRC_LOC="_helpLauncherWeb.js"%]
 
 goog.provide('[%divId%]Web');
 /**
@@ -10,14 +10,9 @@ goog.provide('[%divId%]Web');
 [%divId%]Web.show = function(args_) {
   //app.standardShowPage('[%divId%]');
   app.setMainContent([%divId%].view.getPrimary(null, null));
-
-    goog.events.listen(
-  goog.dom.getElement('launcherShowHelp'),
-  goog.events.EventType.CLICK,
-  goog.partial(app.showPage, "HelpLauncher")
-  );
-
 };
+
+
 
 /**
  * SRC:[%SRC_LOC%]
@@ -31,5 +26,7 @@ goog.provide('[%divId%]Web');
   if (LL.INFO) [%divId%]Web.logger.info('Initialized');
 
   app.dispatch['[%divId%]'] = [%divId%]Web.show;
+
 };
 [%divId%]Web.init();
+goog.require('[%divId%].view');

@@ -17,13 +17,13 @@
       [%validationMsgWidth='0em'%]
       <div class="formFieldGroup" id="[%divId%]Form-[%dbColumnName%]DivId">
         <label for ="[%divId%]Form-[%dbColumnName%]" style="display:inline-block;width:[%labelWidth%];" id="[%divId%]FormLabel-[%dbColumnName%]">User ID</label>
-        <input type="text" style="width:15em" name="[%dbColumnName%]" id="[%divId%]Form-[%dbColumnName%]" class="VALIDATErequired"/>      
+        <input type="text" style="width:15em" name="[%dbColumnName%]" id="[%divId%]Form-[%dbColumnName%]" class="VALIDATErequired" value="ledger"/>      
         <span class="ValidationMsg" style="width:[%validationMsgWidth%]" id="[%divId%]FormLabel-[%toCC(dbColumnName)%]Error"></span>
       </div>
       [%dbColumnName = 'password'%]
       <div class="formFieldGroup" id="[%divId%]Form-[%dbColumnName%]DivId">
         <label for ="[%divId%]Form-[%dbColumnName%]" style="display:inline-block;width:[%labelWidth%];" id="[%divId%]FormLabel-[%dbColumnName%]">Password</label>
-        <input type="password" style="width:15em" name="[%dbColumnName%]" id="[%divId%]Form-[%dbColumnName%]" class="VALIDATErequired"/>      
+        <input type="password" style="width:15em" name="[%dbColumnName%]" id="[%divId%]Form-[%dbColumnName%]" class="VALIDATErequired" value="ledger"/>      
         <span class="ValidationMsg" style="width:[%validationMsgWidth%]" id="[%divId%]FormLabel-[%toCC(dbColumnName)%]Error"></span>
       </div>
       [%dbColumnName = 'password_reset_code'%]
@@ -36,7 +36,7 @@
 
       <div class="formButtons">
 
-        <button type="button"  id="cmdlogin" class="[%buttonClass%]"  onclick="loginCall('authenticate')" > <span class="[%buttonTextClass%]">Login</span> </button>  
+        <button type="button"  id="cmdlogin" class="[%buttonClass%]" > <span class="[%buttonTextClass%]">Login</span> </button>  
         <button type="button"  id="cmdOneTimelogin" class="[%buttonClass%] " style="display:none;"  onclick="loginCall('one_time')" ><span class="[%buttonTextClass%]"> One Time Login</span> </button>  
       </div>
       <label for="trustedDeviceId" style="display:inline-block;">Trusted Device:</label>
@@ -44,7 +44,7 @@
 
     </div>  
   </form>  
-  <a id="testerId" href="" >test</a>
+  <div id="testerId" >test</div>
 </div>
 {/template}
 
