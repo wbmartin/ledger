@@ -1,6 +1,8 @@
 [%divId="AppLogger"%]
 [%SRC_LOC = 'appLogWeb.js'%]
 goog.provide('[%divId%]Web');
+goog.require('AppLogger.view');
+
 /**
  * SRC: [%SRC_LOC%]
  * @param {Object} args_ rendering arguments.
@@ -10,7 +12,11 @@ goog.provide('[%divId%]Web');
   if (LL.FINEST) {
     [%divId%]Web.logger.finest('[%f%] called: ' + goog.debug.expose(args_));
   }
-  app.standardShowPage('[%divId%]');
+  goog.dom.classes.remove(
+      goog.dom.getElement('LoggerConsoleDivId'),
+      'LogicalHide'
+      );
+
 };
 /**
  * SRC:[%SRC_LOC%]

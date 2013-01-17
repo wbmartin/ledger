@@ -154,6 +154,12 @@
   <copy  todir="${deploy.dir}/cgi-bin">
     <fileset dir ="${build.dir}/cgi-bin"/>
   </copy>
+  <chmod  perm="755">
+    <fileset dir ="${deploy.dir}/cgi-bin/">
+      <include name="*.pl"/>
+      <include name="*.pm"/>
+    </fileset>
+  </chmod>
   <copy  todir="${deploy.dir}/images">
     <fileset dir ="${build.dir}/images"/>
   </copy>
@@ -161,21 +167,5 @@
     <fileset file="${build.dir}/index.html"/>
   </copy>
 </target>
-<!--
-<target name="src-cleanup">
-  <foreach name="test" target="simple" param="the_file"> 
-    <path>
-      <fileset dir="${template.dir}">
-      </fileset>
-    </path>
-
-
-  </foreach>
-</target>
-
-<target name="simple">
-  <echo message="${the_file}"/>
-</target>
--->
 
 </project>

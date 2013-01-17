@@ -15,13 +15,13 @@ AppLogger.view.getPrimary = function(opt_data, opt_ignored) {
 // This file was automatically generated from _helpLauncherWeb.soy.
 // Please don't edit this file by hand.
 
-goog.provide('HelpLauncher.view');
+goog.provide('HelpLauncherWeb.view');
 
 goog.require('soy');
 goog.require('soydata');
 
 
-HelpLauncher.view.getPrimary = function(opt_data, opt_ignored) {
+HelpLauncherWeb.view.getPrimary = function(opt_data, opt_ignored) {
   return '<div id="HelpLauncherDivId" class=""><div id ="HelpLauncherCenterDiv" ><div class="row"><h1 id="HelpLauncherTitle" class="pageTitle" >This is a help page&hellip;</h1></div></div></div>';
 };
 

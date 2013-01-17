@@ -1,4 +1,4 @@
-[%SRCLOC="footerWeb.js"%]
+[% SRCLOC = "footerWeb.js" %]
 /**
  *SRC: [SRCLOC]
  */
