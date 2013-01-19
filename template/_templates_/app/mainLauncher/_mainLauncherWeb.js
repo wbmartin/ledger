@@ -15,8 +15,15 @@ goog.require('MainLauncherWeb.view');
   goog.events.listen(
       goog.dom.getElement('launcherShowHelp'),
       goog.events.EventType.CLICK,
-      goog.partial(app.showPage, "HelpLauncher")
+      goog.partial(app.showPage, 'HelpLauncher')
       );
+
+  goog.events.listen(
+      goog.dom.getElement('tableTestLaunchId'),
+      goog.events.EventType.CLICK,
+      goog.partial(app.showPage, 'table')
+      );
+
 };
 
 /**

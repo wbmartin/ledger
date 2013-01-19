@@ -31,7 +31,7 @@ goog.require('Login.view');
 
 
 /**
- * [% f = 'onSuccessfulLogin' %]
+ *[% f = 'onSuccessfulLogin' %]
  * SRC: [% SRC_LOC%]
  * @param {string} session_ the sessionID.
  */

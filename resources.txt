@@ -1,8 +1,0 @@
-[%# http://blog.blazingcloud.net/2012/03/09/manipulating-the-dom-google-closure-vs-jquery/%]
-[%#https://developers.google.com/closure/compiler/docs/js-for-compiler%]
-[%#https://developers.google.com/closure/library/docs/tutorial%]
-[%#http://www.codeproject.com/Articles/265364/First-Adventures-in-Google-Closure%]
-
-http://closure-library.googlecode.com/svn/trunk/closure/goog/demos/index.html
-
-

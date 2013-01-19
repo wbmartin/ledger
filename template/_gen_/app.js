@@ -1,11 +1,10 @@
 'use strict';
 /**
-* 
+*
 */
 
 goog.provide('app');
 
-goog.require('MainLauncher.view');
 goog.require('goog.History');
 goog.require('goog.Uri');
 goog.require('goog.debug');
@@ -31,13 +30,12 @@ goog.require('soydata');
 
 
 /**
- * 
+ *
  * GLOBALS
  *
  */
 
-goog.provide('LL');//LOG LEVEL
-
+var LL = {};
 /**
  * @type {boolean}
  * @const
@@ -62,9 +60,7 @@ LL.FINEST = true;
  */
 LL.ALL = true;
 
-
 goog.provide('app.GLOBAL');
-
 
 /**
  * target page after login unless changed later
@@ -77,9 +73,11 @@ app.GLOBAL.TRUSTED_DEVICE = false;
 /** @type {Object} */
 app.dispatch = {};
 
+app.lastTran = new Date();
+
 /**
  *
- * SRC: 
+ * SRC: _navWeb.js
  * @param {goog.events.Event} e the event.
  */
 app.navCallback = function(e) {
@@ -93,6 +91,7 @@ app.navCallback = function(e) {
   }
 };
 /**
+ *_navWeb.js
  *
  * @param {string} page_ the page to show.
  */
@@ -100,13 +99,13 @@ app.showPage = function(page_) {
   if (LL.FINEST) {app.logger.finest('showPage called:' + page_);}
   app.hist.setToken(page_);
   window['_gaq'].push(['_trackPageview', page_]);
-  return false;
+  return;
 };
 
 goog.provide('app.dispatcher');
 /**
- * 
- * SRC: 
+ *
+ * SRC: _navWeb.js
  * @param {string} request_ the request to dispatch.
  *
  */
@@ -130,7 +129,7 @@ app.dispatcher = function(request_) {
 
 
 /**
- * SRC: 
+ * SRC: _navWeb.js
  * @param {string} contentBlock the div content to replace.
  */
 app.setMainContent = function(contentBlock) {
@@ -139,29 +138,48 @@ app.setMainContent = function(contentBlock) {
 
 
 /**
- * 
- * SRC: 
+ *
+ * SRC: _navWeb.js
  * @param {string} session_ the session string.
  */
 app.standardSuccessfulLogin = function(session_) {
   if (LL.FINEST) {
     app.logger.finest('standardSuccessfulLogin called: ' + session_);
   }
-  var sessionExpirationSeconds = -1;
-  if (!app.GLOBAL.TRUSTED_DEVICE) { sessionExpirationSeconds = 60 * 20; }
-  goog.net.cookies.set('session_id', session_, sessionExpirationSeconds);
-  goog.net.cookies.set('user_id',
-      goog.dom.getElement('LoginForm-user_id').value, sessionExpirationSeconds);
+  app.setSession(goog.dom.getElement('LoginForm-user_id').value, session_);
+  
   goog.dom.getElement('LoginForm-password').value = '';
   app.showPage(app.GLOBAL.TARGET_PAGE);
 };
-
-
 /**
- * 
+ *
+ * SRC: _navWeb.js
+ * @param {string} session_ the session string.
  */
+app.extendSession = function() {
+  currentUserId = goog.net.cookies.get('user_id');
+  currentSessionId = goog.net.cookies.get('session_id');
+  app.setSession(currentUserId,currentSessionId );
+}
 /**
- * 
+ *
+ * SRC: _navWeb.js
+ * @param {string} session_ the session string.
+ */
+app.setSession = function (userId, sessionId){
+    var sessionExpirationSeconds = 60 * 20;
+  if (app.GLOBAL.TRUSTED_DEVICE) { sessionExpirationSeconds = -1; }
+  goog.net.cookies.set('session_id', sessionId, sessionExpirationSeconds);
+  goog.net.cookies.set('user_id', userId, sessionExpirationSeconds);
+}
+
+
+/**
+ *
+ */
+
+/**
+ *
  * SRC: _miscWeb.js
  * @return {boolean} is authenticated.
  */
@@ -174,7 +192,7 @@ app.authenticate = function() {
 };
 
 /**
- * 
+ *
  * SRC: _miscWeb.js
  * @param {string} resource resource to operate.
  * @param {string} action action to take.
@@ -250,7 +268,7 @@ app.svrCall = function(callBack, qdstr) {
 
 
 /*
-* 
+*
 */
 
 
@@ -266,8 +284,6 @@ goog.require('HelpLauncherWeb.view');
 HelpLauncherWeb.show = function(args_) {
   app.setMainContent(HelpLauncherWeb.view.getPrimary(null, null));
 };
-
-
 
 /**
  * SRC:_helpLauncherWeb.js
@@ -285,6 +301,7 @@ HelpLauncherWeb.init();
 
 
 goog.provide('LoginWeb');
+goog.require('Login.view');
 
 /**
  *  SRC: _loginWeb
@@ -292,21 +309,21 @@ goog.provide('LoginWeb');
  */
 LoginWeb.start = function() {
   if (LL.FINEST) {
-  LoginWeb.logger.finest('Call start');
+    LoginWeb.logger.finest('Call start');
   }
   app.GLOBAL.TRUSTED_DEVICE =
-  goog.dom.getElement('LoginForm-trustedDeviceId').checked;
+    goog.dom.getElement('LoginForm-trustedDeviceId').checked;
   /** @type {string} */
   var qstr = app.buildQDStrForm('SECURITY_USER', 'AUTHENTICATE', 'LoginForm');
 
   /** @type {function({goog.events.Event})} */
   var callBack;
   callBack = function(e) {
-  LoginWeb.logger.finest('CallBack: Login Request ');
-  /** @type {Object} */
-  var obj = e.target.getResponseJson();
-  var session = obj['rows'][0]['session_id'];
-  LoginWeb.onSuccessfulLogin(session);
+    LoginWeb.logger.finest('CallBack: Login Request ');
+    /** @type {Object} */
+    var obj = e.target.getResponseJson();
+    var session = obj['rows'][0]['session_id'];
+    LoginWeb.onSuccessfulLogin(session);
   };
   app.svrCall(callBack, qstr);
   return false;
@@ -314,7 +331,8 @@ LoginWeb.start = function() {
 
 
 /**
- *  SRC: _loginWeb
+ *
+ * SRC: _loginWeb
  * @param {string} session_ the sessionID.
  */
 LoginWeb.onSuccessfulLogin = function(session_) {
@@ -329,16 +347,16 @@ LoginWeb.onSuccessfulLogin = function(session_) {
 LoginWeb.show = function(args_) {
   app.setMainContent(Login.view.getPrimary(null, null));
   goog.events.listen(
-  goog.dom.getElement('testerId'),
-  goog.events.EventType.CLICK,
-  LoginWeb.start
-  );
+      goog.dom.getElement('testerId'),
+      goog.events.EventType.CLICK,
+      LoginWeb.start
+      );
 
   goog.events.listen(
-  goog.dom.getElement('cmdlogin'),
-  goog.events.EventType.CLICK,
-  LoginWeb.start
-  );
+      goog.dom.getElement('cmdlogin'),
+      goog.events.EventType.CLICK,
+      LoginWeb.start
+      );
 
 
 };
@@ -350,15 +368,246 @@ LoginWeb.show = function(args_) {
  */
 LoginWeb.init = function() {
   if (LL.ON) {
-  LoginWeb.logger = goog.debug.Logger.getLogger('Login');
-  LoginWeb.logger.setLevel(app.GLOBAL.LOG_LEVEL);
+    LoginWeb.logger = goog.debug.Logger.getLogger('Login');
+    LoginWeb.logger.setLevel(app.GLOBAL.LOG_LEVEL);
   }
   if (LL.INFO) { LoginWeb.logger.info('Initialized'); }
-
-
 };
 LoginWeb.init();
-goog.require('Login.view');
+
+
+
+goog.provide('tableWeb');
+goog.require('tableWeb.view');
+/**
+ * SRC: _tableWeb.js
+ * @param {Object} args_ the args to pass to the show function.
+ *
+ */
+tableWeb.show = function(args_) {
+  var rows = [
+  {
+    id: 0,
+      name: 'test0'
+  },
+  {
+    id: 1,
+    name: 'test1'
+  },
+  {
+    id: 2,
+    name: 'test2'
+  },
+  {
+    id: 3,
+    name: 'test3'
+  }
+
+
+  ];
+  //var tableDef = new ma.TableDef();
+  //tableDef.addColumn(new ma.ColumnDef('id'));
+  //tableDef.addColumn(new ma.ColumnDef('name'));
+  //tableDef.setData(rows);
+  app.setMainContent(tableWeb.view.getPrimary(null, null));
+  var tbl = new ma.elbat();
+  tbl.tableName = 'testskidoo';
+  tbl.tableDef.data = rows;
+  tbl.tableDef.addColumn(new ma.ColumnDef({name: 'id'}));
+  tbl.tableDef.addColumn(new ma.ColumnDef({name: 'name'}));
+  tbl.construct();
+
+
+  // goog.events.listen(
+  //    goog.dom.getElement(''),
+  //    goog.events.EventType.CLICK,
+  //    goog.partial(app.showPage, 'table')
+  //    );
+
+};
+
+goog.provide('ma.elbat');
+/**
+ * SRC:_tableWeb.js
+ *
+ * @constructor
+ */
+ma.elbat = function() {
+  /** @type {ma.TableDef} */
+  this.tableDef = new ma.TableDef();
+  /** @type {string} */
+  this.tableName = 'defaultTableName'
+};
+
+/**
+ * SRC:_tableWeb.js
+ * @return {ma.TableDef} the table definition.
+ */
+ma.elbat.prototype.getTableDef = function() {
+  return this.tableDef;
+};
+
+
+/**
+ * SRC:_tableWeb.js
+ */
+ma.elbat.prototype.construct = function() {
+  var tableOut = '<div id="' + this.tableName + 'DivId">';
+  tableOut +='<table id="' + this.tableName + 'TableId">';
+  tableOut += this.buildHeader();
+  tableOut += this.buildData();
+  tableOut += '</table>';
+  tableOut += '</div>';
+  goog.dom.getElement(this.tableName).innerHTML = tableOut;
+};
+
+/**
+ * SRC:_tableWeb.js
+ * @return {string} the table header.
+ */
+ma.elbat.prototype.buildHeader = function() {
+  var header = '<thead>';
+  var columnLength = this.tableDef.getColumnCount();
+  for (var i = 0; i < columnLength; i++) {
+    header += this.buildHeaderCell(i);
+  }
+  header += '</thead>';
+  return header;
+};
+
+/**
+ * @param {number} columnId the column to display.
+ * @return {string}
+ */
+ma.elbat.prototype.buildHeaderCell = function (columnId){
+  var thcell='';
+  var tc = this.tableDef.getColumn(columnId);
+  if (tc.visible){
+    thcell = '<th>' + tc.name + '</th>';
+  }
+  return thcell;
+}
+
+/**
+ * SRC:_tableWeb.js
+ * @return {string} the tablebody.
+ */
+ma.elbat.prototype.buildData = function() {
+  var tbody = '<tbody>';
+  var rowLength = this.tableDef.data.length;
+  var colLength = this.tableDef.getColumnCount();
+  for (var i = 0; i < rowLength; i++) {
+    tbody += '<tr>';//tableWeb.view.row(tableDef_.getRow(i),null);
+    for (var j = 0; j < colLength; j++) {
+      tbody += this.buildCell(i,j);
+    }
+    tbody += '</tr>';
+  }
+  tbody += '</tbody>';
+  return tbody;
+};
+
+/**
+ * SRC:_tableWeb.js
+ * @return {string} the table cell.
+ * @param {Object} tr the table row.
+ * @param {Object} tc the table column def.
+ */
+ma.elbat.prototype.buildCell = function(trId, tcId) {
+  var tr = this.tableDef.getRow(trId);
+  var tc = this.tableDef.getColumn(tcId);
+  var cell ='';
+  if (tc.visible){
+    cell ='<td>' + tr[tc.name] + '</td>';
+  }
+  return cell;
+};
+
+/**
+ *
+ */
+goog.provide('ma.TableDef');
+
+/**
+ * SRC:_tableWeb.js
+ *
+ * @constructor
+ */
+ma.TableDef = function() {
+  this.columns = new Array();
+  this.data = new Array;
+};
+
+/**
+ * SRC:_tableWeb.js
+ * @param {ma.ColumnDef} newColumn the column definition.
+ */
+ma.TableDef.prototype.addColumn = function(newColumn) {
+  this.columns.push(newColumn);
+};
+/**
+ * SRC:_tableWeb.js
+ * @param {number} rowNumber the rownumber.
+ * @return {Object} the data row.
+ */
+ma.TableDef.prototype.getRow = function(rowNumber) {
+  return this.data[rowNumber];
+};
+/**
+ * SRC:_tableWeb.js
+ * @return {number}  the number ofrows in the table.
+ */
+ma.TableDef.prototype.getRowCount = function() {
+  return this.data.length;
+};
+/**
+ * SRC:_tableWeb.js
+ * @param {number} colNumber the array index of the column number.
+ * @return {ma.ColumnDef} the column Definition.
+ */
+ma.TableDef.prototype.getColumn = function(colNumber) {
+  return this.columns[colNumber];
+};
+/**
+ * SRC:_tableWeb.js
+ * @return {number} the number of columns.
+ */
+ma.TableDef.prototype.getColumnCount = function() {
+  return this.columns.length;
+};
+
+
+
+
+
+
+/**
+ * SRC:_tableWeb.js
+ * @constructor
+ * @param {object} columnName the name.
+ */
+ma.ColumnDef = function(options) {
+  /** @type {string} */
+  this.name = typeof options.name !== 'undefined' ? options.name :'defaultName';
+  /** @type {boolean} */
+  this.visible = typeof options.visible !== 'undefined' ? options.visible : true;
+};
+
+
+/**
+ * SRC:_tableWeb.js
+ *
+ */
+tableWeb.init = function() {
+  if (LL.ON) {
+    tableWeb.logger = goog.debug.Logger.getLogger('table');
+    tableWeb.logger.setLevel(app.GLOBAL.LOG_LEVEL);
+  }
+  if (LL.INFO) tableWeb.logger.info('Initialized');
+  app.dispatch['table'] = tableWeb.show;
+};
+tableWeb.init();
+
 
 
 goog.provide('AppLoggerWeb');
@@ -396,6 +645,7 @@ AppLoggerWeb.init = function() {
 
 
 goog.provide('MainLauncherWeb');
+goog.require('MainLauncherWeb.view');
 /**
  * SRC: _mainLauncherWeb.js
  * @param {Object} args_ the args to pass to the show function.
@@ -403,13 +653,19 @@ goog.provide('MainLauncherWeb');
  */
 MainLauncherWeb.show = function(args_) {
   //app.standardShowPage('MainLauncher');
-  app.setMainContent(MainLauncher.view.getPrimary(null, null));
+  app.setMainContent(MainLauncherWeb.view.getPrimary(null, null));
 
-    goog.events.listen(
-  goog.dom.getElement('launcherShowHelp'),
-  goog.events.EventType.CLICK,
-  goog.partial(app.showPage, "HelpLauncher")
-  );
+  goog.events.listen(
+      goog.dom.getElement('launcherShowHelp'),
+      goog.events.EventType.CLICK,
+      goog.partial(app.showPage, 'HelpLauncher')
+      );
+
+  goog.events.listen(
+      goog.dom.getElement('tableTestLaunchId'),
+      goog.events.EventType.CLICK,
+      goog.partial(app.showPage, 'table')
+      );
 
 };
 
@@ -423,7 +679,6 @@ MainLauncherWeb.init = function() {
     MainLauncherWeb.logger.setLevel(app.GLOBAL.LOG_LEVEL);
   }
   if (LL.INFO) MainLauncherWeb.logger.info('Initialized');
-
   app.dispatch['MainLauncher'] = MainLauncherWeb.show;
 };
 MainLauncherWeb.init();

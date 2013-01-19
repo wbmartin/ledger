@@ -1341,7 +1341,7 @@ soy.$$bidiUnicodeWrap = function(bidiGlobalDir, str) {
 // START GENERATED CODE FOR ESCAPERS.
 
 /**
- * @type {function (*) : string}
+ * @type {function(*) : string}
  */
 soy.esc.$$escapeUriHelper = function(v) {
   return goog.string.urlEncode(String(v));

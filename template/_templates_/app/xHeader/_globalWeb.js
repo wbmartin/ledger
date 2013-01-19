@@ -1,11 +1,10 @@
 /**
- * [% SRC_LOC = '_global.js' %]
+ *[% SRC_LOC = '_global.js' %]
  * GLOBALS
  *
  */
 
-goog.provide('LL');//LOG LEVEL
-
+var LL = {};
 /**
  * @type {boolean}
  * @const
@@ -42,3 +41,5 @@ app.GLOBAL.TARGET_PAGE = 'MainLauncher';
 app.GLOBAL.TRUSTED_DEVICE = false;
 /** @type {Object} */
 app.dispatch = {};
+
+app.lastTran = new Date();

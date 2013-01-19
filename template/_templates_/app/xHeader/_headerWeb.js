@@ -1,3 +1,3 @@
 /*
-* [% SRC_LOC = '_headerWeb.js'%]
+*[% SRC_LOC = '_headerWeb.js'%]
 */

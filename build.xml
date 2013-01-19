@@ -25,7 +25,9 @@
   </target>
 
   <target name="build-soy">
-    <fileset id="soy.dir" dir="${templategen.dir}" includes="*.soy"/> 
+    <fileset id="soy.dir" dir="${templategen.dir}" includes="*.soy"> 
+    <size value="0"  when="more"/>
+  </fileset>
     <pathconvert pathsep=" --srcs " property="soyfiles" refid="soy.dir"/>
     <echo message="${soyfiles}"/>
     <exec executable="java">
@@ -62,9 +64,10 @@
       <arg line="-p -i -e 's/[ \t]+$//g'"/>
       <arg line="${jsfiles}"/>
     </exec>
-
-
-
+     <exec dir="${basedir}" executable="perl">
+      <arg line="-p -i -e 's/function \(/function(/g'"/>
+      <arg line="${jsfiles}"/>
+    </exec>
   </target>
 
   <target name="build-postclean">
@@ -166,6 +169,83 @@
   <copy  todir="${deploy.dir}">
     <fileset file="${build.dir}/index.html"/>
   </copy>
+</target>
+<target name="lint" depends="cleansource, build">
+  <exec executable="gjslint" failonerror="true" logError="true">
+    <arg value="${build.dir}/app.js" />
+  </exec>
+</target>
+
+<target name="initialbuild">
+
+<!--
+#!/usr/bin/bash
+mkdir db
+mkdir lib
+mkdir template
+mkdir template/_gen_
+mkdir tempate/_template_
+mkdir template/_template_/xHeader/
+mkdir build
+mkdir build/app/
+mkdir build/app/cgi-bin
+mkdir build/app/images
+svn checkout http://closure-library.googlecode.com/svn/trunk/ build/closure-library
+
+mkdir deploy
+echo You Need to copy into template:  1.DBGen_Util.pm 2.generateTemplates.pl 3.include.properties
+echo "you need to adjust grants on symlink, but this will adjust the target dir: sudo chown www-data *; sudo chgrp www-data *;sudo chmod 644 *"
+echo "you need to copy proj-root executables and config files"
+echo "you need to copy build/app/cgi-bin/ files"
+echo "you need to look at otherconfig.txt"
+sudo ln -s /home/wbmartin/www/ledger/build /var/www/ledger-build
+sudo ln -s /home/wbmartin/www/ledger /var/www/ledger
+echo "closure-library/" > build/.gitignore
+
+update /etc/apache2/sites-available
+then restart apache: sudo /etc/init.d/apache2 restart
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.
+ScriptAlias /ledger/cgi-bin/ /home/wbmartin/www/ledger/deploy/cgi-bin/
+  <Directory "/home/wbmartin/www/ledger/deploy/cgi-bin">
+            AllowOverride None
+            Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+            Order allow,deny
+            Allow from all
+   </Directory>
+
+ScriptAlias /ledger-build/app/cgi-bin/ /home/wbmartin/www/ledger/build/app/cgi-bin/
+  <Directory "/home/wbmartin/www/ledger/build/app/cgi-bin">
+              AllowOverride None
+              Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+              Order allow,deny
+              Allow from all
+  </Directory>
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.
+     -->
+</target>
+
+<target name="resources">
+<echo message="http://blog.blazingcloud.net/2012/03/09/manipulating-the-dom-google-closure-vs-jquery/"/>
+<echo message="https://developers.google.com/closure/compiler/docs/js-for-compiler"/>
+<echo message="https://developers.google.com/closure/library/docs/tutorial"/>
+<echo message="http://www.codeproject.com/Articles/265364/First-Adventures-in-Google-Closure"/>
+<echo message="http://closure-library.googlecode.com/svn/trunk/closure/goog/demos/index.html"/>
+<echo message=""/>
+<echo message=""/>
+</target>
+
+<!--example: ant MakePageShell -Dpage='test'-->
+<target name="MakePageShell">
+  <echo message="Creating page shell: ${page}"/>
+  <property name="pageshelldir" value="${template.dir}/app/${page}"/>
+  <mkdir dir="${pageshelldir}"/>
+  <touch file="${pageshelldir}/_${page}Web.html"/>
+  <touch file="${pageshelldir}/_${page}Web.js"/>
+  <touch file="${pageshelldir}/_${page}Mobile.html"/>
+  <touch file="${pageshelldir}/_${page}Mobile.js"/>
+  <touch file="${pageshelldir}/_${page}Common.js"/>
+  <touch file="${pageshelldir}/_${page}Common.html"/>
 </target>
 
 </project>

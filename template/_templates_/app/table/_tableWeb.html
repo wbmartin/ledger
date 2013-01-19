@@ -1,0 +1,25 @@
+[%divId ='table'%]
+{namespace [%divId%]Web.view}
+/**
+* [%divId%]
+*/
+{template .getPrimary}
+<div id="[%divId%]DivId" class="">
+  <div id ="[%divId%]CenterDiv" >
+    <div class="row">
+      <h1 id="[%divId%]Title" class="pageTitle" >This is a table &hellip;</h1>
+      <div id="testskidoo">
+        
+      </div>
+    </div>
+  </div>
+</div>
+{/template}
+/**
+* @param id the id.
+* @param name the name.
+*/
+{template .row}
+<tr><td>{$id}</td><td>{$name}</td></tr>
+{/template}
+

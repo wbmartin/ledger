@@ -1,9 +1,9 @@
 /**
- * [% SRC_LOC = '_miscWeb.js'%]
+ *[% SRC_LOC = '_miscWeb.js'%]
  */
 
 /**
- * [% f = 'authenticate' %]
+ *[% f = 'authenticate' %]
  * SRC: [%SRC_LOC%]
  * @return {boolean} is authenticated.
  */
@@ -16,7 +16,7 @@ app.[% f %] = function() {
 };
 
 /**
- * [% f = 'buildQDStrForm' %]
+ *[% f = 'buildQDStrForm' %]
  * SRC: [% SRC_LOC %]
  * @param {string} resource resource to operate.
  * @param {string} action action to take.

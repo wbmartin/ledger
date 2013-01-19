@@ -43,12 +43,31 @@ Login.view.getPrimary = function(opt_data, opt_ignored) {
 // This file was automatically generated from _mainLauncherWeb.soy.
 // Please don't edit this file by hand.
 
-goog.provide('MainLauncher.view');
+goog.provide('MainLauncherWeb.view');
 
 goog.require('soy');
 goog.require('soydata');
 
 
-MainLauncher.view.getPrimary = function(opt_data, opt_ignored) {
-  return '<div id="MainLauncherDivId" class=""><div id ="MainLauncherCenterDiv" ><div class="row"><h1 id="MainLauncherTitle" class="pageTitle" >I want to&hellip;</h1></div><div class="row"><div class="twocol largeIconSpan" id="launcherShowHelp"><span class="sprite64Icon helpIcon">&nbsp;</span><br/>Get Help</div><div class="twocol largeIconSpan" id="launcherShowAccessGroupsSpanId"><a id="launcherShowSecurityAccessGroups" onclick=""><span class="sprite64Icon keyIcon">&nbsp;</span><br/>Access Groups</a></div><div class="twocol last largeIconSpan" id="launcherShowSecurityUserSpanId"><a id="launcherShowSecurityUserId" onclick=""><span class="sprite64Icon keyManIcon">&nbsp;</span><br/>Application Users</a></div><div class="twocol last largeIconSpan" id="launcherShowChangeOwnPasswordSpanId"><a id="launcherShowChangePassword" onclick=""><span class="sprite64Icon lockIcon">&nbsp;</span><br/>Change My Password</a></div></div></div></div>';
+MainLauncherWeb.view.getPrimary = function(opt_data, opt_ignored) {
+  return '<div id="MainLauncherDivId" class=""><div id ="MainLauncherCenterDiv" ><div class="row"><h1 id="MainLauncherTitle" class="pageTitle" >I want to&hellip;</h1></div><div class="row"><div class="twocol largeIconSpan" id="launcherShowHelp"><span class="sprite64Icon helpIcon">&nbsp;</span><br/>Get Help</div><div class="twocol largeIconSpan" id="tableTestLaunchId"><span class="sprite64Icon lightningFolderIcon ">&nbsp;</span><br/>table</div><div class="twocol largeIconSpan" id="launcherShowAccessGroupsSpanId"><a id="launcherShowSecurityAccessGroups" onclick=""><span class="sprite64Icon keyIcon">&nbsp;</span><br/>Access Groups</a></div><div class="twocol last largeIconSpan" id="launcherShowSecurityUserSpanId"><a id="launcherShowSecurityUserId" onclick=""><span class="sprite64Icon keyManIcon">&nbsp;</span><br/>Application Users</a></div><div class="twocol last largeIconSpan" id="launcherShowChangeOwnPasswordSpanId"><a id="launcherShowChangePassword" onclick=""><span class="sprite64Icon lockIcon">&nbsp;</span><br/>Change My Password</a></div></div></div></div>';
+};
+
+;
+// This file was automatically generated from _tableWeb.soy.
+// Please don't edit this file by hand.
+
+goog.provide('tableWeb.view');
+
+goog.require('soy');
+goog.require('soydata');
+
+
+tableWeb.view.getPrimary = function(opt_data, opt_ignored) {
+  return '<div id="tableDivId" class=""><div id ="tableCenterDiv" ><div class="row"><h1 id="tableTitle" class="pageTitle" >This is a table &hellip;</h1><div id="testskidoo"></div></div></div></div>';
+};
+
+
+tableWeb.view.row = function(opt_data, opt_ignored) {
+  return '<tr><td>' + soy.$$escapeHtml(opt_data.id) + '</td><td>' + soy.$$escapeHtml(opt_data.name) + '</td></tr>';
 };

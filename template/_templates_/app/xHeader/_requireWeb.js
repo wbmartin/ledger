@@ -1,5 +1,5 @@
 /**
-* [% SRC_LOC = _requireWeb.js%]
+*[% SRC_LOC = _requireWeb.js%]
 */
 
 goog.provide('app');
