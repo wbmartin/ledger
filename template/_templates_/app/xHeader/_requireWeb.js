@@ -2,10 +2,10 @@
 *[% SRC_LOC = _requireWeb.js%]
 */
 
-goog.provide('app');
 
 goog.require('goog.History');
 goog.require('goog.Uri');
+goog.require('goog.array');
 goog.require('goog.debug');
 goog.require('goog.debug.DivConsole');
 goog.require('goog.debug.ErrorHandler');
@@ -26,4 +26,5 @@ goog.require('goog.string');
 goog.require('goog.userAgent');
 goog.require('soy');
 goog.require('soydata');
+
 

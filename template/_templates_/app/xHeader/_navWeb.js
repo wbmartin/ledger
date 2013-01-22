@@ -1,16 +1,32 @@
+//[% SRC_LOC = '_navWeb.js'%]
+
+
 /**
- *[% SRC_LOC = '_navWeb.js'%]
+ *[% f = 'authenticate' %]
+ * SRC: [%SRC_LOC%]
+ * @return {boolean} is authenticated.
+ */
+App.[% f %] = function() {
+ App.logger_.finest('[%f%] called:'); 
+  if (goog.net.cookies.get('session_id') === undefined) {
+    return false;
+  }
+  return true;
+};
+
+/**
+ *
  * SRC: [% SRC_LOC %]
  * @param {goog.events.Event} e the event.
  */
-app.navCallback = function(e) {
+App.navCallback = function(e) {
   if (e.token === 'LOGIN') { return; }
-  if (app.authenticate()) {
-    app.dispatcher(e.token);
+  if (App.authenticate()) {
+    App.dispatcher(e.token);
   } else {
-    app.GLOBAL.TARGET_PAGE = location.hash.substr(1);
+    App.GLOBAL.TARGET_PAGE = location.hash.substr(1);
     location.hash = 'LOGIN';
-    LoginWeb.show(null);
+    new LoginWeb();
   }
 };
 /**
@@ -18,22 +34,22 @@ app.navCallback = function(e) {
  *[% f = 'showPage' %]
  * @param {string} page_ the page to show.
  */
-app.[% f %] = function(page_) {
-  if (LL.FINEST) {app.logger.finest('[%f%] called:' + page_);}
-  app.hist.setToken(page_);
+App.prototype.[% f %] = function(page_) {
+  App.logger_.finest('[%f%] called:' + page_);
+  App.GLOBAL.onScreenPageTarget.dispatchEvent('DIPOSE_ALL');
+  App.hist.setToken(page_);
   window['_gaq'].push(['_trackPageview', page_]);
   return;
 };
 
-goog.provide('app.dispatcher');
 /**
  *[% f = 'dispatcher' %]
  * SRC: [% SRC_LOC %]
  * @param {string} request_ the request to dispatch.
  *
  */
-app.[% f %] = function(request_) {
-  if (LL.FINEST) app.logger.finest('[%f%] Called');
+App.[% f %] = function(request_) {
+  App.logger_.finest('[%f%] Called');
   /** @type {goog.Uri} */
   var urlData = goog.Uri.parse(request_);
   /** @type string*/
@@ -46,7 +62,7 @@ app.[% f %] = function(request_) {
   if (urlData.path_ == undefined || urlData.path_ == '') {
     urlData.path_ = 'MainLauncher';
   }
-  app.dispatch[urlData.path_](qdObject);
+  App.dispatch[urlData.path_](qdObject);
 
 };
 
@@ -55,7 +71,8 @@ app.[% f %] = function(request_) {
  * SRC: [% SRC_LOC %]
  * @param {string} contentBlock the div content to replace.
  */
-app.setMainContent = function(contentBlock) {
+App.prototype.setMainContent = function(contentBlock) {
+  App.GLOBAL.onScreenPageTarget.dispatchEvent('DISPOSE_ALL');
   goog.dom.getElement('mainContent').innerHTML = contentBlock;
 };
 
@@ -65,20 +82,18 @@ app.setMainContent = function(contentBlock) {
  * SRC: [% SRC_LOC %]
  * @param {string} session_ the session string.
  */
-app.[% f %] = function(session_) {
-  if (LL.FINEST) {
-    app.logger.finest('[%f%] called: ' + session_);
-  }
-  app.initSession(goog.dom.getElement('LoginForm-user_id').value, session_);
+App.prototype.[% f %] = function(session_) {
+    App.logger_.finest('[%f%] called: ' + session_);
+  this.initSession(goog.dom.getElement('LoginForm-user_id').value, session_);
   goog.dom.getElement('LoginForm-password').value = '';
-  app.showPage(app.GLOBAL.TARGET_PAGE);
+  this.showPage(App.GLOBAL.TARGET_PAGE);
 };
 /**
  *[% f ='extendSession' %]
  * SRC: [% SRC_LOC %]
  * @param {string} session_ the session string.
  */
-app.[% f %] = function() {
+App.prototype.[% f %] = function() {
   app.initSession(
       goog.net.cookies.get('user_id'),
       goog.net.cookies.get('session_id'));
@@ -88,10 +103,42 @@ app.[% f %] = function() {
  * SRC: [% SRC_LOC %]
  * @param {string} session_ the session string.
  */
-app.[% f %] = function (userId, sessionId){
+App.prototype.[% f %] = function(userId, sessionId){
   var sessionExpirationSeconds = 60 * 20;
-  if (app.GLOBAL.TRUSTED_DEVICE) { sessionExpirationSeconds = -1; }
+  if (App.GLOBAL.TRUSTED_DEVICE) { sessionExpirationSeconds = -1; }
   goog.net.cookies.set('session_id', sessionId, sessionExpirationSeconds);
   goog.net.cookies.set('user_id', userId, sessionExpirationSeconds);
 }
+
+/**
+ *[% f ='addComponentToScreen' %]
+ * SRC: [% SRC_LOC %]
+ * @param {string} session_ the session string.
+ */
+
+App.prototype.[% f %] = function(addTo, component){
+  var parentComponent = goog.dom.getElement(addTo);
+  goog.dom.appendChild(parentComponent, component);
+  //app.GLOBAL.onScreenComponents.push(component);
+};
+
+/**
+ *[% f ='disposeOnScreenComponents' %]
+ * SRC: [% SRC_LOC %]
+ * @param {string} session_ the session string.
+ */
+
+App.prototype.[% f %] = function(){
+  var ndx = 0;
+  var onScreenCount = app.GLOBAL.onScreenComponents.length;
+  var component;
+  for(ndx = 0; ndx < onScreenCount; ndx++) {
+    component = app.GLOBAL.onScreenComponents.pop();
+    if (typeof component.dispose === 'function'){
+      component.dispose();
+    }
+  }
+
+
+};
 

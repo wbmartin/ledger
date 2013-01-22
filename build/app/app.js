@@ -3,10 +3,10 @@
 *
 */
 
-goog.provide('app');
 
 goog.require('goog.History');
 goog.require('goog.Uri');
+goog.require('goog.array');
 goog.require('goog.debug');
 goog.require('goog.debug.DivConsole');
 goog.require('goog.debug.ErrorHandler');
@@ -29,65 +29,85 @@ goog.require('soy');
 goog.require('soydata');
 
 
+
+goog.provide('App');
+
 /**
+ * SRC: 
+ * @constructor
  *
- * GLOBALS
- *
  */
+App = function(){
+  /** @type {goog.debug.Logger.Level} */
+  var logconsole =
+    new goog.debug.DivConsole(goog.dom.getElement('loggerConsole'));
+  logconsole.setCapturing(true);
+  App.logger_.setLevel(App.GLOBAL.LOG_LEVEL);
+  App.logger_.info(' Initialized');
 
-var LL = {};
+  //app.debugWindow = new goog.debug.FancyWindow('main');
+  //    app.debugWindow.setEnabgoog.debug.Logger.Level.ALLled(true);
+  //    app.debugWindow.init();
+};
 /**
- * @type {boolean}
- * @const
+ * A reference to the  logger
+ * @type {goog.debug.Logger}
+ * @private
  */
-LL.ON = true;
-
-/**
- * @type {boolean}
- * @const
- */
-LL.INFO = true;
-
-/**
- * @type {boolean}
- * @const
- */
-LL.FINEST = true;
-
-/**
- * @type {boolean}
- * @const
- */
-LL.ALL = true;
-
-goog.provide('app.GLOBAL');
+App.logger_ = goog.debug.Logger.getLogger('app');
+goog.provide('App.GLOBAL');
 
 /**
  * target page after login unless changed later
  * @type string
  */
-app.GLOBAL.TARGET_PAGE = 'MainLauncher';
+App.GLOBAL.TARGET_PAGE = 'MainLauncher';
 
 /** @type {boolean} */
-app.GLOBAL.TRUSTED_DEVICE = false;
+App.GLOBAL.TRUSTED_DEVICE = false;
 /** @type {Object} */
-app.dispatch = {};
+App.dispatch = {};
 
-app.lastTran = new Date();
+App.lastTran = new Date();
+
+App.GLOBAL.onScreenPageTarget = new goog.events.EventTarget();
+App.GLOBAL.LOG_LEVEL = goog.debug.Logger.Level.ALL;
+
+var app = new App();
+
+
+
+
+
+//
+
+
+/**
+ *
+ * SRC: _navWeb.js
+ * @return {boolean} is authenticated.
+ */
+App.authenticate = function() {
+ App.logger_.finest('authenticate called:'); 
+  if (goog.net.cookies.get('session_id') === undefined) {
+    return false;
+  }
+  return true;
+};
 
 /**
  *
  * SRC: _navWeb.js
  * @param {goog.events.Event} e the event.
  */
-app.navCallback = function(e) {
+App.navCallback = function(e) {
   if (e.token === 'LOGIN') { return; }
-  if (app.authenticate()) {
-    app.dispatcher(e.token);
+  if (App.authenticate()) {
+    App.dispatcher(e.token);
   } else {
-    app.GLOBAL.TARGET_PAGE = location.hash.substr(1);
+    App.GLOBAL.TARGET_PAGE = location.hash.substr(1);
     location.hash = 'LOGIN';
-    LoginWeb.show(null);
+    new LoginWeb();
   }
 };
 /**
@@ -95,22 +115,22 @@ app.navCallback = function(e) {
  *
  * @param {string} page_ the page to show.
  */
-app.showPage = function(page_) {
-  if (LL.FINEST) {app.logger.finest('showPage called:' + page_);}
-  app.hist.setToken(page_);
+App.prototype.showPage = function(page_) {
+  App.logger_.finest('showPage called:' + page_);
+  App.GLOBAL.onScreenPageTarget.dispatchEvent('DIPOSE_ALL');
+  App.hist.setToken(page_);
   window['_gaq'].push(['_trackPageview', page_]);
   return;
 };
 
-goog.provide('app.dispatcher');
 /**
  *
  * SRC: _navWeb.js
  * @param {string} request_ the request to dispatch.
  *
  */
-app.dispatcher = function(request_) {
-  if (LL.FINEST) app.logger.finest('dispatcher Called');
+App.dispatcher = function(request_) {
+  App.logger_.finest('dispatcher Called');
   /** @type {goog.Uri} */
   var urlData = goog.Uri.parse(request_);
   /** @type string*/
@@ -123,7 +143,7 @@ app.dispatcher = function(request_) {
   if (urlData.path_ == undefined || urlData.path_ == '') {
     urlData.path_ = 'MainLauncher';
   }
-  app.dispatch[urlData.path_](qdObject);
+  App.dispatch[urlData.path_](qdObject);
 
 };
 
@@ -132,7 +152,8 @@ app.dispatcher = function(request_) {
  * SRC: _navWeb.js
  * @param {string} contentBlock the div content to replace.
  */
-app.setMainContent = function(contentBlock) {
+App.prototype.setMainContent = function(contentBlock) {
+  App.GLOBAL.onScreenPageTarget.dispatchEvent('DISPOSE_ALL');
   goog.dom.getElement('mainContent').innerHTML = contentBlock;
 };
 
@@ -142,54 +163,71 @@ app.setMainContent = function(contentBlock) {
  * SRC: _navWeb.js
  * @param {string} session_ the session string.
  */
-app.standardSuccessfulLogin = function(session_) {
-  if (LL.FINEST) {
-    app.logger.finest('standardSuccessfulLogin called: ' + session_);
-  }
-  app.setSession(goog.dom.getElement('LoginForm-user_id').value, session_);
-  
+App.prototype.standardSuccessfulLogin = function(session_) {
+    App.logger_.finest('standardSuccessfulLogin called: ' + session_);
+  this.initSession(goog.dom.getElement('LoginForm-user_id').value, session_);
   goog.dom.getElement('LoginForm-password').value = '';
-  app.showPage(app.GLOBAL.TARGET_PAGE);
+  this.showPage(App.GLOBAL.TARGET_PAGE);
 };
 /**
  *
  * SRC: _navWeb.js
  * @param {string} session_ the session string.
  */
-app.extendSession = function() {
-  currentUserId = goog.net.cookies.get('user_id');
-  currentSessionId = goog.net.cookies.get('session_id');
-  app.setSession(currentUserId,currentSessionId );
+App.prototype.extendSession = function() {
+  app.initSession(
+      goog.net.cookies.get('user_id'),
+      goog.net.cookies.get('session_id'));
 }
 /**
  *
  * SRC: _navWeb.js
  * @param {string} session_ the session string.
  */
-app.setSession = function (userId, sessionId){
-    var sessionExpirationSeconds = 60 * 20;
-  if (app.GLOBAL.TRUSTED_DEVICE) { sessionExpirationSeconds = -1; }
+App.prototype.initSession = function(userId, sessionId){
+  var sessionExpirationSeconds = 60 * 20;
+  if (App.GLOBAL.TRUSTED_DEVICE) { sessionExpirationSeconds = -1; }
   goog.net.cookies.set('session_id', sessionId, sessionExpirationSeconds);
   goog.net.cookies.set('user_id', userId, sessionExpirationSeconds);
 }
 
-
 /**
  *
+ * SRC: _navWeb.js
+ * @param {string} session_ the session string.
  */
 
-/**
- *
- * SRC: _miscWeb.js
- * @return {boolean} is authenticated.
- */
-app.authenticate = function() {
-  if (LL.FINEST) { app.logger.finest('authenticate called:'); }
-  if (goog.net.cookies.get('session_id') === undefined) {
-    return false;
-  }
-  return true;
+App.prototype.addComponentToScreen = function(addTo, component){
+  var parentComponent = goog.dom.getElement(addTo);
+  goog.dom.appendChild(parentComponent, component);
+  //app.GLOBAL.onScreenComponents.push(component);
 };
+
+/**
+ *
+ * SRC: _navWeb.js
+ * @param {string} session_ the session string.
+ */
+
+App.prototype.disposeOnScreenComponents = function(){
+  var ndx = 0;
+  var onScreenCount = app.GLOBAL.onScreenComponents.length;
+  var component;
+  for(ndx = 0; ndx < onScreenCount; ndx++) {
+    component = app.GLOBAL.onScreenComponents.pop();
+    if (typeof component.dispose === 'function'){
+      component.dispose();
+    }
+  }
+
+
+};
+
+
+/**
+ *
+ */
+
 
 /**
  *
@@ -199,7 +237,7 @@ app.authenticate = function() {
  * @param {string} form  name of the form.
  * @return {string} the built query string.
  */
-app.buildQDStrForm = function(resource, action, form) {
+App.prototype.buildQDStrForm = function(resource, action, form) {
   /** @type {string} */
   var qstr = goog.dom.forms.getFormDataString(
       /** @type {HTMLFormElement} */(goog.dom.getElement(form))
@@ -207,50 +245,26 @@ app.buildQDStrForm = function(resource, action, form) {
   var qd = new goog.Uri.QueryData(qstr);
   qd.add('spwfResource', resource);
   qd.add('spwfAction', action);
-  if (LL.FINEST) {
-    app.logger.finest('Server Call Built' + qstr.toString());
-  }
-  return qd.toString();
+  
+    App.logger_.finest('Server Call Built' + qstr.toString());
+    return qd.toString();
 };
 
 /**
  * The tracking element input is located in _footerWeb.html
  * SRC: _miscWeb.js
  */
-app.initHistory = function() {
+App.prototype.initHistory = function() {
   /** @type {HTMLInputElement} */
   var trackingElement = /** @type {HTMLInputElement} */
     (goog.dom.getElement('historyTrackerId'));
-  app.hist = new goog.History(false, undefined, trackingElement);
-  goog.events.listen(app.hist,
+  App.hist = new goog.History(false, undefined, trackingElement);
+  goog.events.listen(App.hist,
       goog.history.EventType.NAVIGATE,
-      app.navCallback);
-  app.hist.setEnabled(true);
+      App.navCallback);
+  App.hist.setEnabled(true);
 };
 
-/**
- *
- * SRC: _miscWeb.js
- */
-app.init = function() {
-  /** @type {goog.debug.Logger.Level} */
-  app.GLOBAL.LOG_LEVEL = goog.debug.Logger.Level.ALL;
-  if (LL.ON) {
-    var logconsole =
-      new goog.debug.DivConsole(goog.dom.getElement('loggerConsole'));
-    logconsole.setCapturing(true);
-    app.logger = goog.debug.Logger.getLogger('app');
-    app.logger.setLevel(app.GLOBAL.LOG_LEVEL);
-  }
-  if (LL.INFO) app.logger.info('buildQDStrForm Initialized');
-
-  //app.debugWindow = new goog.debug.FancyWindow('main');
-  //    app.debugWindow.setEnabgoog.debug.Logger.Level.ALLled(true);
-  //    app.debugWindow.init();
-
-
-};
-app.init();
 
 
 /**
@@ -258,12 +272,28 @@ app.init();
  * @param {function(?)} callBack the function to execute.
  * @param {string} qdstr query data string.
  */
-app.svrCall = function(callBack, qdstr) {
+App.prototype.svrCall = function(callBack, qdstr) {
   //var xhr = new goog.net.XhrIo();
   //goog.events.listen(xhr, goog.net.EventType.COMPLETE, callBack);
   //xhr.send('./cgi-bin/server.pl', 'POST', qdstr);
   goog.net.XhrIo.send('./cgi-bin/server.pl', callBack, 'POST', qdstr);
 };
+
+/**
+ * @constructor
+ */
+goog.provide('PageHelper');
+PageHelper = function(){
+  
+}
+goog.inherits (PageHelper, goog.Disposable);
+
+PageHelper.prototype.init = function(pageId) {
+  this.eh1 = new goog.events.EventHandler();
+}
+
+
+
 
 
 
@@ -275,43 +305,75 @@ app.svrCall = function(callBack, qdstr) {
 
 
 goog.provide('HelpLauncherWeb');
-goog.require('HelpLauncherWeb.view');
+goog.require('HelpLauncherWebView');
+
+
+/**
+ *@constructor
+ */
+HelpLauncherWeb = function(){
+ this.logger_.setLevel(App.GLOBAL.LOG_LEVEL);
+  this.logger_.info('Initialized');
+  App.dispatch['HelpLauncher'] = this.show;
+}
+
+/**
+ * A reference to the  logger
+ * @type {goog.debug.Logger}
+ * @private
+ */
+HelpLauncherWeb.prototype.logger_ = goog.debug.Logger.getLogger('HelpLauncher');
+
 /**
  * SRC: _helpLauncherWeb.js
  * @param {Object} args_ the args to pass to the show function.
  *
  */
-HelpLauncherWeb.show = function(args_) {
-  app.setMainContent(HelpLauncherWeb.view.getPrimary(null, null));
+HelpLauncherWeb.prototype.show = function(args_) {
+  app.setMainContent(HelpLauncherWebView.getPrimary(null, null));
 };
 
-/**
- * SRC:_helpLauncherWeb.js
- *
- */
-HelpLauncherWeb.init = function() {
-  if (LL.ON) {
-    HelpLauncherWeb.logger = goog.debug.Logger.getLogger('HelpLauncher');
-    HelpLauncherWeb.logger.setLevel(app.GLOBAL.LOG_LEVEL);
-  }
-  if (LL.INFO) HelpLauncherWeb.logger.info('Initialized');
-  app.dispatch['HelpLauncher'] = HelpLauncherWeb.show;
-};
-HelpLauncherWeb.init();
+new HelpLauncherWeb();
 
 
 goog.provide('LoginWeb');
-goog.require('Login.view');
+goog.require('LoginWebView');
 
 /**
- *  SRC: _loginWeb
+ * @constructor
+ */
+LoginWeb = function(){
+  App.logger_.setLevel(App.GLOBAL.LOG_LEVEL);
+  this.init('Login');
+  goog.events.listenOnce(App.GLOBAL.onScreenPageTarget, 'DIPOSE_ALL', this.dispose, false, this);
+  goog.Disposable.call(this);
+  app.setMainContent(LoginWebView.getPrimary(null, null));
+  this.eh1.listen(
+      goog.dom.getElement('cmdlogin'),
+      goog.events.EventType.CLICK,
+      this.attemptLogin
+      );
+}
+goog.inherits(LoginWeb , PageHelper);
+
+/**
+ * A reference to the  logger
+ * @type {goog.debug.Logger}
+ * @private
+ */
+LoginWeb.prototype.logger_ = goog.debug.Logger.getLogger('Login');
+
+LoginWeb.prototype.disposeInternal = function(){
+  goog.dispose(this.eh1);
+}
+
+/**
+ *  SRC: _loginWeb2
  *  @return {boolean} false to not refresh the page.
  */
-LoginWeb.start = function() {
-  if (LL.FINEST) {
-    LoginWeb.logger.finest('Call start');
-  }
-  app.GLOBAL.TRUSTED_DEVICE =
+LoginWeb.prototype.attemptLogin = function() {
+  App.logger_.finest('Call start');
+  App.GLOBAL.TRUSTED_DEVICE =
     goog.dom.getElement('LoginForm-trustedDeviceId').checked;
   /** @type {string} */
   var qstr = app.buildQDStrForm('SECURITY_USER', 'AUTHENTICATE', 'LoginForm');
@@ -319,294 +381,87 @@ LoginWeb.start = function() {
   /** @type {function({goog.events.Event})} */
   var callBack;
   callBack = function(e) {
-    LoginWeb.logger.finest('CallBack: Login Request ');
+    App.logger_.finest('CallBack: Login Request ');
     /** @type {Object} */
     var obj = e.target.getResponseJson();
     var session = obj['rows'][0]['session_id'];
-    LoginWeb.onSuccessfulLogin(session);
+    if (session != '') {
+      app.standardSuccessfulLogin(session);
+    } else {
+      alert ('failed');
+    }
   };
   app.svrCall(callBack, qstr);
   return false;
 };
 
 
-/**
- *
- * SRC: _loginWeb
- * @param {string} session_ the sessionID.
- */
-LoginWeb.onSuccessfulLogin = function(session_) {
-  LoginWeb.logger.finest('Call onSuccessfulLogin');
-  app.standardSuccessfulLogin(session_);
-};
-
-/**
- * SRC: _loginWeb
- * @param {Object} args_ the args object.
- */
-LoginWeb.show = function(args_) {
-  app.setMainContent(Login.view.getPrimary(null, null));
-  goog.events.listen(
-      goog.dom.getElement('testerId'),
-      goog.events.EventType.CLICK,
-      LoginWeb.start
-      );
-
-  goog.events.listen(
-      goog.dom.getElement('cmdlogin'),
-      goog.events.EventType.CLICK,
-      LoginWeb.start
-      );
-
-
-};
-
-
-/**
- * SRC: _loginWeb
- *
- */
-LoginWeb.init = function() {
-  if (LL.ON) {
-    LoginWeb.logger = goog.debug.Logger.getLogger('Login');
-    LoginWeb.logger.setLevel(app.GLOBAL.LOG_LEVEL);
-  }
-  if (LL.INFO) { LoginWeb.logger.info('Initialized'); }
-};
-LoginWeb.init();
 
 
 
 goog.provide('tableWeb');
 goog.require('tableWeb.view');
+
+
+/**
+ *
+ * @constructor
+ */
+tableWeb = function(){
+   this.logger_.setLevel(app.GLOBAL.LOG_LEVEL);
+  this.logger_.info('Initialized');
+  app.dispatch['table'] = tableWeb.show;
+
+}
+/**
+ * A reference to the  logger
+ * @type {goog.debug.Logger}
+ * @private
+ */
+tableWeb.prototype.logger_ = goog.debug.Logger.getLogger('table');
+
 /**
  * SRC: _tableWeb.js
  * @param {Object} args_ the args to pass to the show function.
  *
  */
-tableWeb.show = function(args_) {
+tableWeb.prototype.show = function(args_) {
   var rows = [
   {
     id: 0,
-      name: 'test0'
+      name: 'A'
   },
   {
     id: 1,
-    name: 'test1'
+    name: 'B'
   },
   {
     id: 2,
-    name: 'test2'
+    name: 'C'
   },
   {
     id: 3,
-    name: 'test3'
+    name: 'D'
+  },
+  {
+    id: 4,
+    name: 'A'
   }
-
-
   ];
-  //var tableDef = new ma.TableDef();
-  //tableDef.addColumn(new ma.ColumnDef('id'));
-  //tableDef.addColumn(new ma.ColumnDef('name'));
-  //tableDef.setData(rows);
   app.setMainContent(tableWeb.view.getPrimary(null, null));
-  var tbl = new ma.elbat();
+  var tbl = new ma.plugin.table();
   tbl.tableName = 'testskidoo';
-  tbl.tableDef.data = rows;
-  tbl.tableDef.addColumn(new ma.ColumnDef({name: 'id'}));
-  tbl.tableDef.addColumn(new ma.ColumnDef({name: 'name'}));
+  tbl.data = rows;
+  tbl.addColumn(new ma.ColumnDef({name: 'id'}));
+  tbl.addColumn(new ma.ColumnDef({name: 'name'}));
+  tbl.sortColumns = ['name'];
+  tbl.sortOrder = 'ASC';
+  tbl.idColumn = 'id';
+  tbl.trIdPrefix = 'test';
   tbl.construct();
 
-
-  // goog.events.listen(
-  //    goog.dom.getElement(''),
-  //    goog.events.EventType.CLICK,
-  //    goog.partial(app.showPage, 'table')
-  //    );
-
 };
 
-goog.provide('ma.elbat');
-/**
- * SRC:_tableWeb.js
- *
- * @constructor
- */
-ma.elbat = function() {
-  /** @type {ma.TableDef} */
-  this.tableDef = new ma.TableDef();
-  /** @type {string} */
-  this.tableName = 'defaultTableName'
-};
-
-/**
- * SRC:_tableWeb.js
- * @return {ma.TableDef} the table definition.
- */
-ma.elbat.prototype.getTableDef = function() {
-  return this.tableDef;
-};
-
-
-/**
- * SRC:_tableWeb.js
- */
-ma.elbat.prototype.construct = function() {
-  var tableOut = '<div id="' + this.tableName + 'DivId">';
-  tableOut +='<table id="' + this.tableName + 'TableId">';
-  tableOut += this.buildHeader();
-  tableOut += this.buildData();
-  tableOut += '</table>';
-  tableOut += '</div>';
-  goog.dom.getElement(this.tableName).innerHTML = tableOut;
-};
-
-/**
- * SRC:_tableWeb.js
- * @return {string} the table header.
- */
-ma.elbat.prototype.buildHeader = function() {
-  var header = '<thead>';
-  var columnLength = this.tableDef.getColumnCount();
-  for (var i = 0; i < columnLength; i++) {
-    header += this.buildHeaderCell(i);
-  }
-  header += '</thead>';
-  return header;
-};
-
-/**
- * @param {number} columnId the column to display.
- * @return {string}
- */
-ma.elbat.prototype.buildHeaderCell = function (columnId){
-  var thcell='';
-  var tc = this.tableDef.getColumn(columnId);
-  if (tc.visible){
-    thcell = '<th>' + tc.name + '</th>';
-  }
-  return thcell;
-}
-
-/**
- * SRC:_tableWeb.js
- * @return {string} the tablebody.
- */
-ma.elbat.prototype.buildData = function() {
-  var tbody = '<tbody>';
-  var rowLength = this.tableDef.data.length;
-  var colLength = this.tableDef.getColumnCount();
-  for (var i = 0; i < rowLength; i++) {
-    tbody += '<tr>';//tableWeb.view.row(tableDef_.getRow(i),null);
-    for (var j = 0; j < colLength; j++) {
-      tbody += this.buildCell(i,j);
-    }
-    tbody += '</tr>';
-  }
-  tbody += '</tbody>';
-  return tbody;
-};
-
-/**
- * SRC:_tableWeb.js
- * @return {string} the table cell.
- * @param {Object} tr the table row.
- * @param {Object} tc the table column def.
- */
-ma.elbat.prototype.buildCell = function(trId, tcId) {
-  var tr = this.tableDef.getRow(trId);
-  var tc = this.tableDef.getColumn(tcId);
-  var cell ='';
-  if (tc.visible){
-    cell ='<td>' + tr[tc.name] + '</td>';
-  }
-  return cell;
-};
-
-/**
- *
- */
-goog.provide('ma.TableDef');
-
-/**
- * SRC:_tableWeb.js
- *
- * @constructor
- */
-ma.TableDef = function() {
-  this.columns = new Array();
-  this.data = new Array;
-};
-
-/**
- * SRC:_tableWeb.js
- * @param {ma.ColumnDef} newColumn the column definition.
- */
-ma.TableDef.prototype.addColumn = function(newColumn) {
-  this.columns.push(newColumn);
-};
-/**
- * SRC:_tableWeb.js
- * @param {number} rowNumber the rownumber.
- * @return {Object} the data row.
- */
-ma.TableDef.prototype.getRow = function(rowNumber) {
-  return this.data[rowNumber];
-};
-/**
- * SRC:_tableWeb.js
- * @return {number}  the number ofrows in the table.
- */
-ma.TableDef.prototype.getRowCount = function() {
-  return this.data.length;
-};
-/**
- * SRC:_tableWeb.js
- * @param {number} colNumber the array index of the column number.
- * @return {ma.ColumnDef} the column Definition.
- */
-ma.TableDef.prototype.getColumn = function(colNumber) {
-  return this.columns[colNumber];
-};
-/**
- * SRC:_tableWeb.js
- * @return {number} the number of columns.
- */
-ma.TableDef.prototype.getColumnCount = function() {
-  return this.columns.length;
-};
-
-
-
-
-
-
-/**
- * SRC:_tableWeb.js
- * @constructor
- * @param {object} columnName the name.
- */
-ma.ColumnDef = function(options) {
-  /** @type {string} */
-  this.name = typeof options.name !== 'undefined' ? options.name :'defaultName';
-  /** @type {boolean} */
-  this.visible = typeof options.visible !== 'undefined' ? options.visible : true;
-};
-
-
-/**
- * SRC:_tableWeb.js
- *
- */
-tableWeb.init = function() {
-  if (LL.ON) {
-    tableWeb.logger = goog.debug.Logger.getLogger('table');
-    tableWeb.logger.setLevel(app.GLOBAL.LOG_LEVEL);
-  }
-  if (LL.INFO) tableWeb.logger.info('Initialized');
-  app.dispatch['table'] = tableWeb.show;
-};
-tableWeb.init();
 
 
 
@@ -645,43 +500,51 @@ AppLoggerWeb.init = function() {
 
 
 goog.provide('MainLauncherWeb');
-goog.require('MainLauncherWeb.view');
-/**
- * SRC: _mainLauncherWeb.js
- * @param {Object} args_ the args to pass to the show function.
- *
- */
-MainLauncherWeb.show = function(args_) {
-  //app.standardShowPage('MainLauncher');
-  app.setMainContent(MainLauncherWeb.view.getPrimary(null, null));
+goog.require('MainLauncherWebView');
 
-  goog.events.listen(
+MainLauncherWeb = function(){
+  this.logger_.setLevel(App.GLOBAL.LOG_LEVEL);
+  this.init('MainLauncher');
+  goog.events.listenOnce(App.GLOBAL.onScreenPageTarget, 'DIPOSE_ALL', this.dispose, false, this);
+  app.setMainContent(MainLauncherWebView.getPrimary(null, null));
+  this.eh1.listen(
       goog.dom.getElement('launcherShowHelp'),
       goog.events.EventType.CLICK,
       goog.partial(app.showPage, 'HelpLauncher')
       );
 
-  goog.events.listen(
+  this.eh1.listen(
       goog.dom.getElement('tableTestLaunchId'),
       goog.events.EventType.CLICK,
       goog.partial(app.showPage, 'table')
       );
-
 };
+
+goog.inherits(MainLauncherWeb, PageHelper);
+
+MainLauncherWeb.prototype.disposeInternal = function(){
+  goog.dispose(this.eh1);
+}
+
 
 /**
- * SRC:_mainLauncherWeb.js
+ * A reference to the  logger
+ * @type {goog.debug.Logger}
+ * @private
+ */
+MainLauncherWeb.prototype.logger_ = goog.debug.Logger.getLogger('MainLauncher');
+
+
+/**
+ * SRC: _mainLauncherWeb.js
+ * @param {Object} args_ the args to pass to the show function.
  *
  */
-MainLauncherWeb.init = function() {
-  if (LL.ON) {
-    MainLauncherWeb.logger = goog.debug.Logger.getLogger('MainLauncher');
-    MainLauncherWeb.logger.setLevel(app.GLOBAL.LOG_LEVEL);
-  }
-  if (LL.INFO) MainLauncherWeb.logger.info('Initialized');
-  app.dispatch['MainLauncher'] = MainLauncherWeb.show;
+MainLauncherWeb.prototype.show = function(args_) {
+
 };
-MainLauncherWeb.init();
+
+App.dispatch['MainLauncher'] = function (){new MainLauncherWeb();};
 
 
 /**
@@ -695,6 +558,215 @@ if (val_ == undefined || val_ == null) return ifnull_;
 return val_;
 };
 
+
+//
+goog.provide('ma.plugin.table');
+/**
+ * SRC:_Web.js
+ *
+ * @constructor
+ */
+ma.plugin.table = function() {
+  /** @type {string} */
+  this.tableName = 'defaultTableName';
+    this.columns = new Array();
+  this.data = new Array();
+  this.sortColumns = new Array();
+  this.sortOrder = 'ASC';
+  this.trIdPrefix = '';
+  this.tdIdPrefix = ''
+    this.idColumn = '';
+  this.tableName = 'defaultTableName';
+  this.trClass = '';
+
+};
+
+
+
+/**
+ * SRC:_Web.js
+ */
+ma.plugin.table.prototype.construct = function() {
+  var tableOut = '<div id="' + this.tableName + 'DivId">';
+  tableOut +='<table id="' + this.tableName + 'TableId">';
+  tableOut += this.buildHeader();
+  tableOut += this.buildData();
+  tableOut += '</table>';
+  tableOut += '</div>';
+  goog.dom.getElement(this.tableName).innerHTML = tableOut;
+};
+
+/**
+ * SRC:_Web.js
+ * @return {string} the table header.
+ */
+ma.plugin.table.prototype.buildHeader = function() {
+  var header = '<thead>';
+  var columnLength = this.getColumnCount();
+  for (var i = 0; i < columnLength; i++) {
+    header += this.buildHeaderCell(i);
+  }
+  header += '</thead>';
+  return header;
+};
+
+/**
+ * @param {number} columnId the column to display.
+ * @return {string}
+ */
+ma.plugin.table.prototype.buildHeaderCell = function (columnId){
+  var thcell='';
+  var tc = this.getColumn(columnId);
+  if (tc.visible){
+    thcell = '<th>' + tc.name + '</th>';
+  }
+  return thcell;
+}
+
+/**
+ * SRC:_Web.js
+ * @return {string} the tablebody.
+ */
+ma.plugin.table.prototype.buildData = function() {
+  var tbody = '<tbody>';
+  var rowLength = this.data.length;
+  var rowNdx;
+  var colNdx;
+  if (this.sortColumns.length > 0) {
+    var sortFunction = function (sortColumns, sortOrder, a,b) {
+      var result
+        var sortColumn1 = sortColumns[0];
+      if (a[sortColumns[0]] < b[sortColumns[0]]) result = -1;
+      else if (a[sortColumns[0]] > b[sortColumns[0]]) result = 1; 
+      else {
+        if (typeof sortColumns[1] !== 'undefined' ){
+          if (a[sortColumns[1]] < b[sortColumns[1]]) result = -1;
+          else if (a[sortColumns[1]] > b[sortColumn[1]]) result = 1; 
+          else  result = 0;
+        } else {
+          result = 0;
+        }
+      }
+      if (sortOrder === 'DESC') {result *= -1;}
+      return result;
+    };
+    goog.array.sort(this.data, goog.partial(
+          sortFunction,this.sortColumns, this.sortOrder));
+
+  }   
+
+  for (rowNdx = 0; rowNdx < rowLength; rowNdx++) {
+    tbody += this.buildRow(rowNdx);
+  }
+  tbody += '</tbody>';
+  return tbody;
+};
+
+/**
+ * SRC:_Web.js
+ * @return {string} the table cell.
+ * @param {Object} tr the table row.
+ * @param {Object} tc the table column def.
+ */
+ma.plugin.table.prototype.buildCell = function(tr, tcId) {
+  var tc = this.getColumn(tcId);
+  var cell ='';
+  if (tc.visible){
+    cell = '<td id ="td' + tc.name ;
+    cell += this.getRowId(tr) + '">';
+    cell += tr[tc.name] + '</td>';
+  }
+  return cell;
+};
+
+ma.plugin.table.prototype.buildRow = function(rowNdx){
+  var rowId;
+  var currentRow = this.getRow(rowNdx);
+  var rowStr = '';
+  var colLength = this.getColumnCount();
+  rowStr += '<tr id="' + this.getRowPrefix() + this.getRowId(currentRow, rowNdx);
+  rowStr +=  '" class="' + currentRow.trClass + '">';
+  for (var colNdx = 0; colNdx < colLength; colNdx++) {
+    rowStr += this.buildCell(currentRow,colNdx);
+  }
+  rowStr += '</tr>';
+  return rowStr;
+}
+
+ma.plugin.table.prototype.getRowId = function(row, rowNdx){
+  var rowId='';
+  if (this.idColumn !== '') {
+    rowId = row[this.idColumn];
+  } else {
+    rowId = rowNdx;
+  }
+  return rowId;
+}
+
+ma.plugin.table.prototype.getRowPrefix = function() {
+  var rowPrefix ='';
+  if (this.trIdPrefix !== '') { 
+    rowPrefix = this.trIdPrefix;
+  } else {
+    rowPrefix = 'defaultTrId';
+  }
+  return rowPrefix;
+}
+
+/**
+ * SRC:_Web.js
+ * @param {ma.ColumnDef} newColumn the column definition.
+ */
+ma.plugin.table.prototype.addColumn = function(newColumn) {
+  this.columns.push(newColumn);
+};
+/**
+ * SRC:_Web.js
+ * @param {number} rowNumber the rownumber.
+ * @return {Object} the data row.
+ */
+ma.plugin.table.prototype.getRow = function(rowNumber) {
+  return this.data[rowNumber];
+};
+/**
+ * SRC:_Web.js
+ * @return {number}  the number ofrows in the table.
+ */
+ma.plugin.table.prototype.getRowCount = function() {
+  return this.data.length;
+};
+/**
+ * SRC:_Web.js
+ * @param {number} colNumber the array index of the column number.
+ * @return {ma.ColumnDef} the column Definition.
+ */
+ma.plugin.table.prototype.getColumn = function(colNumber) {
+  return this.columns[colNumber];
+};
+/**
+ * SRC:_Web.js
+ * @return {number} the number of columns.
+ */
+ma.plugin.table.prototype.getColumnCount = function() {
+  return this.columns.length;
+};
+
+
+
+
+
+
+/**
+ * SRC:_Web.js
+ * @constructor
+ * @param {object} columnName the name.
+ */
+ma.ColumnDef = function(options) {
+  /** @type {string} */
+  this.name = typeof options.name !== 'undefined' ? options.name :'defaultName';
+  /** @type {boolean} */
+  this.visible = typeof options.visible !== 'undefined' ? options.visible : true;
+};
 
 
 /**

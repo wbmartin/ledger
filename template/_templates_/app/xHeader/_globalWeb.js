@@ -1,45 +1,48 @@
+goog.provide('App');
+
 /**
- *[% SRC_LOC = '_global.js' %]
- * GLOBALS
+ * SRC: [% SRC_LOC %]
+ * @constructor
  *
  */
+App = function(){
+  /** @type {goog.debug.Logger.Level} */
+  var logconsole =
+    new goog.debug.DivConsole(goog.dom.getElement('loggerConsole'));
+  logconsole.setCapturing(true);
+  App.logger_.setLevel(App.GLOBAL.LOG_LEVEL);
+  App.logger_.info('[%f%] Initialized');
 
-var LL = {};
+  //app.debugWindow = new goog.debug.FancyWindow('main');
+  //    app.debugWindow.setEnabgoog.debug.Logger.Level.ALLled(true);
+  //    app.debugWindow.init();
+};
 /**
- * @type {boolean}
- * @const
+ * A reference to the  logger
+ * @type {goog.debug.Logger}
+ * @private
  */
-LL.ON = true;
-
-/**
- * @type {boolean}
- * @const
- */
-LL.INFO = true;
-
-/**
- * @type {boolean}
- * @const
- */
-LL.FINEST = true;
-
-/**
- * @type {boolean}
- * @const
- */
-LL.ALL = true;
-
-goog.provide('app.GLOBAL');
+App.logger_ = goog.debug.Logger.getLogger('app');
+goog.provide('App.GLOBAL');
 
 /**
  * target page after login unless changed later
  * @type string
  */
-app.GLOBAL.TARGET_PAGE = 'MainLauncher';
+App.GLOBAL.TARGET_PAGE = 'MainLauncher';
 
 /** @type {boolean} */
-app.GLOBAL.TRUSTED_DEVICE = false;
+App.GLOBAL.TRUSTED_DEVICE = false;
 /** @type {Object} */
-app.dispatch = {};
+App.dispatch = {};
 
-app.lastTran = new Date();
+App.lastTran = new Date();
+
+App.GLOBAL.onScreenPageTarget = new goog.events.EventTarget();
+App.GLOBAL.LOG_LEVEL = goog.debug.Logger.Level.ALL;
+
+var app = new App();
+
+
+
+
