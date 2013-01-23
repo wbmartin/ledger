@@ -57,17 +57,17 @@ MainLauncherWebView.getPrimary = function(opt_data, opt_ignored) {
 // This file was automatically generated from _tableWeb.soy.
 // Please don't edit this file by hand.
 
-goog.provide('tableWeb.view');
+goog.provide('tableWebView');
 
 goog.require('soy');
 goog.require('soydata');
 
 
-tableWeb.view.getPrimary = function(opt_data, opt_ignored) {
+tableWebView.getPrimary = function(opt_data, opt_ignored) {
   return '<div id="tableDivId" class=""><div id ="tableCenterDiv" ><div class="row"><h1 id="tableTitle" class="pageTitle" >This is a table &hellip;</h1><div id="testskidoo"></div></div></div></div>';
 };
 
 
-tableWeb.view.row = function(opt_data, opt_ignored) {
+tableWebView.row = function(opt_data, opt_ignored) {
   return '<tr><td>' + soy.$$escapeHtml(opt_data.id) + '</td><td>' + soy.$$escapeHtml(opt_data.name) + '</td></tr>';
 };

@@ -5,29 +5,26 @@ goog.require('AppLogger.view');
 
 /**
  * SRC: [%SRC_LOC%]
- * @param {Object} args_ rendering arguments.
+ * @constructor
  */
-[%f='show'%]
-[%divId%]Web.[%f%] = function(args_) {
-  if (LL.FINEST) {
-    [%divId%]Web.logger.finest('[%f%] called: ' + goog.debug.expose(args_));
-  }
+[%divId%]Web = function() {
+  this.logger_.finest('[%f%] called: ' );
   goog.dom.classes.remove(
       goog.dom.getElement('LoggerConsoleDivId'),
       'LogicalHide'
       );
+  this.logger_.setLevel(App.GLOBAL.LOG_LEVEL);
+  this.logger_.info('Initialized');
+  [%divId%]Web.divId = '[%divId%]';
+
 
 };
+
 /**
- * SRC:[%SRC_LOC%]
- *
+ * A reference to the  logger
+ * @type {goog.debug.Logger}
+ * @private
  */
-[%divId%]Web.init = function() {
-  if (LL.ON) {
-    [%divId%]Web.logger = goog.debug.Logger.getLogger('[%divId%]');
-    [%divId%]Web.logger.setLevel(app.GLOBAL.LOG_LEVEL);
-  }
-  if (LL.INFO) [%divId%]Web.logger.info('Initialized');
-  [%divId%]Web.divId = '[%divId%]';
-  app.dispatch['[%divId%]'] = [%divId%]Web.show;
-};
+[%divId%]Web.prototype.logger_ = goog.debug.Logger.getLogger('[%divId%]');
+  App.dispatch['[%divId%]'] = function() { new [%divId%]Web()};
+

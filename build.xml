@@ -21,7 +21,8 @@
     <copy file="${templategen.dir}/index.html" todir="${build.dir}"/>
     <copy file="${templategen.dir}/app.js" todir="${build.dir}"/>
     <copy file="${templategen.dir}/webpages.js" todir="${build.dir}"/>
-    <copy file="${template.dir}/app/lib/soyutils_usegoog.js" todir="${build.dir}"/>
+    <copy file="${template.dir}/app/xlib/soyutils_usegoog.js" todir="${build.dir}"/>
+    <copy file="${template.dir}/app/xlib/pagehelper.js" todir="${build.dir}"/>
   </target>
 
   <target name="build-soy">
@@ -135,7 +136,7 @@
     <arg value="${closure-library.dir}/closure/bin/build/closurebuilder.py" />
     <arg value='--root=${closure-library.dir}/'/>
     <arg value='--root=${build.dir}/'/>
-    <arg line='--namespace="app"'/>
+    <arg line='--namespace="App"'/>
     <arg line='--output_mode=compiled'/>
     <arg line='--compiler_jar=${closurecompiler.dir}/compiler.jar'/>
     <arg line='--compiler_flags="--compilation_level=ADVANCED_OPTIMIZATIONS"'/>

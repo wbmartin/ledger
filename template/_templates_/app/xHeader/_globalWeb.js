@@ -6,7 +6,7 @@ goog.provide('App');
  *
  */
 App = function(){
-  /** @type {goog.debug.Logger.Level} */
+  /** @type {goog.debug.DivConsole} */
   var logconsole =
     new goog.debug.DivConsole(goog.dom.getElement('loggerConsole'));
   logconsole.setCapturing(true);
@@ -41,7 +41,8 @@ App.lastTran = new Date();
 App.GLOBAL.onScreenPageTarget = new goog.events.EventTarget();
 App.GLOBAL.LOG_LEVEL = goog.debug.Logger.Level.ALL;
 
-var app = new App();
+goog.provide('app');
+app = new App();
 
 
 

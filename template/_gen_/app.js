@@ -1,4 +1,5 @@
 'use strict';
+//Generated: Tue Jan 22 23:55:46 2013
 /**
 *
 */
@@ -27,6 +28,7 @@ goog.require('goog.string');
 goog.require('goog.userAgent');
 goog.require('soy');
 goog.require('soydata');
+goog.require('PageHelper');
 
 
 
@@ -38,7 +40,7 @@ goog.provide('App');
  *
  */
 App = function(){
-  /** @type {goog.debug.Logger.Level} */
+  /** @type {goog.debug.DivConsole} */
   var logconsole =
     new goog.debug.DivConsole(goog.dom.getElement('loggerConsole'));
   logconsole.setCapturing(true);
@@ -73,7 +75,8 @@ App.lastTran = new Date();
 App.GLOBAL.onScreenPageTarget = new goog.events.EventTarget();
 App.GLOBAL.LOG_LEVEL = goog.debug.Logger.Level.ALL;
 
-var app = new App();
+goog.provide('app');
+app = new App();
 
 
 
@@ -172,7 +175,6 @@ App.prototype.standardSuccessfulLogin = function(session_) {
 /**
  *
  * SRC: _navWeb.js
- * @param {string} session_ the session string.
  */
 App.prototype.extendSession = function() {
   app.initSession(
@@ -182,7 +184,8 @@ App.prototype.extendSession = function() {
 /**
  *
  * SRC: _navWeb.js
- * @param {string} session_ the session string.
+ * @param {string} userId the user.
+ * @param {string} sessionId the session string.
  */
 App.prototype.initSession = function(userId, sessionId){
   var sessionExpirationSeconds = 60 * 20;
@@ -191,30 +194,18 @@ App.prototype.initSession = function(userId, sessionId){
   goog.net.cookies.set('user_id', userId, sessionExpirationSeconds);
 }
 
-/**
- *
- * SRC: _navWeb.js
- * @param {string} session_ the session string.
- */
-
-App.prototype.addComponentToScreen = function(addTo, component){
-  var parentComponent = goog.dom.getElement(addTo);
-  goog.dom.appendChild(parentComponent, component);
-  //app.GLOBAL.onScreenComponents.push(component);
-};
 
 /**
  *
  * SRC: _navWeb.js
- * @param {string} session_ the session string.
  */
-
+/*
 App.prototype.disposeOnScreenComponents = function(){
   var ndx = 0;
-  var onScreenCount = app.GLOBAL.onScreenComponents.length;
+  var onScreenCount = App.GLOBAL.onScreenComponents.length;
   var component;
   for(ndx = 0; ndx < onScreenCount; ndx++) {
-    component = app.GLOBAL.onScreenComponents.pop();
+    component = App.GLOBAL.onScreenComponents.pop();
     if (typeof component.dispose === 'function'){
       component.dispose();
     }
@@ -222,6 +213,7 @@ App.prototype.disposeOnScreenComponents = function(){
 
 
 };
+*/
 
 
 /**
@@ -279,19 +271,6 @@ App.prototype.svrCall = function(callBack, qdstr) {
   goog.net.XhrIo.send('./cgi-bin/server.pl', callBack, 'POST', qdstr);
 };
 
-/**
- * @constructor
- */
-goog.provide('PageHelper');
-PageHelper = function(){
-  
-}
-goog.inherits (PageHelper, goog.Disposable);
-
-PageHelper.prototype.init = function(pageId) {
-  this.eh1 = new goog.events.EventHandler();
-}
-
 
 
 
@@ -340,6 +319,7 @@ goog.provide('LoginWeb');
 goog.require('LoginWebView');
 
 /**
+ * @extends {PageHelper}
  * @constructor
  */
 LoginWeb = function(){
@@ -400,17 +380,18 @@ LoginWeb.prototype.attemptLogin = function() {
 
 
 goog.provide('tableWeb');
-goog.require('tableWeb.view');
+goog.require('tableWebView');
 
 
 /**
  *
+ * SRC: _tableWeb.js
  * @constructor
  */
 tableWeb = function(){
-   this.logger_.setLevel(app.GLOBAL.LOG_LEVEL);
+   this.logger_.setLevel(App.GLOBAL.LOG_LEVEL);
   this.logger_.info('Initialized');
-  app.dispatch['table'] = tableWeb.show;
+  App.dispatch['table'] = tableWeb.show;
 
 }
 /**
@@ -448,7 +429,7 @@ tableWeb.prototype.show = function(args_) {
     name: 'A'
   }
   ];
-  app.setMainContent(tableWeb.view.getPrimary(null, null));
+  app.setMainContent(tableWebView.getPrimary(null, null));
   var tbl = new ma.plugin.table();
   tbl.tableName = 'testskidoo';
   tbl.data = rows;
@@ -470,38 +451,39 @@ goog.require('AppLogger.view');
 
 /**
  * SRC: appLogWeb.js
- * @param {Object} args_ rendering arguments.
+ * @constructor
  */
-
-AppLoggerWeb.show = function(args_) {
-  if (LL.FINEST) {
-    AppLoggerWeb.logger.finest('show called: ' + goog.debug.expose(args_));
-  }
+AppLoggerWeb = function() {
+  this.logger_.finest(' called: ' );
   goog.dom.classes.remove(
       goog.dom.getElement('LoggerConsoleDivId'),
       'LogicalHide'
       );
+  this.logger_.setLevel(App.GLOBAL.LOG_LEVEL);
+  this.logger_.info('Initialized');
+  AppLoggerWeb.divId = 'AppLogger';
+
 
 };
+
 /**
- * SRC:appLogWeb.js
- *
+ * A reference to the  logger
+ * @type {goog.debug.Logger}
+ * @private
  */
-AppLoggerWeb.init = function() {
-  if (LL.ON) {
-    AppLoggerWeb.logger = goog.debug.Logger.getLogger('AppLogger');
-    AppLoggerWeb.logger.setLevel(app.GLOBAL.LOG_LEVEL);
-  }
-  if (LL.INFO) AppLoggerWeb.logger.info('Initialized');
-  AppLoggerWeb.divId = 'AppLogger';
-  app.dispatch['AppLogger'] = AppLoggerWeb.show;
-};
+AppLoggerWeb.prototype.logger_ = goog.debug.Logger.getLogger('AppLogger');
+  App.dispatch['AppLogger'] = function() { new AppLoggerWeb()};
+
 
 
 
 goog.provide('MainLauncherWeb');
 goog.require('MainLauncherWebView');
 
+/**
+ * @constructor
+ * @extends {PageHelper}
+ */
 MainLauncherWeb = function(){
   this.logger_.setLevel(App.GLOBAL.LOG_LEVEL);
   this.init('MainLauncher');
@@ -562,7 +544,7 @@ return val_;
 //
 goog.provide('ma.plugin.table');
 /**
- * SRC:_Web.js
+ * SRC:_tableCommon.js
  *
  * @constructor
  */
@@ -584,7 +566,7 @@ ma.plugin.table = function() {
 
 
 /**
- * SRC:_Web.js
+ * SRC:_tableCommon.js
  */
 ma.plugin.table.prototype.construct = function() {
   var tableOut = '<div id="' + this.tableName + 'DivId">';
@@ -597,7 +579,7 @@ ma.plugin.table.prototype.construct = function() {
 };
 
 /**
- * SRC:_Web.js
+ * SRC:_tableCommon.js
  * @return {string} the table header.
  */
 ma.plugin.table.prototype.buildHeader = function() {
@@ -624,7 +606,7 @@ ma.plugin.table.prototype.buildHeaderCell = function (columnId){
 }
 
 /**
- * SRC:_Web.js
+ * SRC:_tableCommon.js
  * @return {string} the tablebody.
  */
 ma.plugin.table.prototype.buildData = function() {
@@ -641,7 +623,7 @@ ma.plugin.table.prototype.buildData = function() {
       else {
         if (typeof sortColumns[1] !== 'undefined' ){
           if (a[sortColumns[1]] < b[sortColumns[1]]) result = -1;
-          else if (a[sortColumns[1]] > b[sortColumn[1]]) result = 1; 
+          else if (a[sortColumns[1]] > b[sortColumns[1]]) result = 1; 
           else  result = 0;
         } else {
           result = 0;
@@ -663,7 +645,7 @@ ma.plugin.table.prototype.buildData = function() {
 };
 
 /**
- * SRC:_Web.js
+ * SRC:_tableCommon.js
  * @return {string} the table cell.
  * @param {Object} tr the table row.
  * @param {Object} tc the table column def.
@@ -714,14 +696,14 @@ ma.plugin.table.prototype.getRowPrefix = function() {
 }
 
 /**
- * SRC:_Web.js
+ * SRC:_tableCommon.js
  * @param {ma.ColumnDef} newColumn the column definition.
  */
 ma.plugin.table.prototype.addColumn = function(newColumn) {
   this.columns.push(newColumn);
 };
 /**
- * SRC:_Web.js
+ * SRC:_tableCommon.js
  * @param {number} rowNumber the rownumber.
  * @return {Object} the data row.
  */
@@ -729,14 +711,14 @@ ma.plugin.table.prototype.getRow = function(rowNumber) {
   return this.data[rowNumber];
 };
 /**
- * SRC:_Web.js
+ * SRC:_tableCommon.js
  * @return {number}  the number ofrows in the table.
  */
 ma.plugin.table.prototype.getRowCount = function() {
   return this.data.length;
 };
 /**
- * SRC:_Web.js
+ * SRC:_tableCommon.js
  * @param {number} colNumber the array index of the column number.
  * @return {ma.ColumnDef} the column Definition.
  */
@@ -744,7 +726,7 @@ ma.plugin.table.prototype.getColumn = function(colNumber) {
   return this.columns[colNumber];
 };
 /**
- * SRC:_Web.js
+ * SRC:_tableCommon.js
  * @return {number} the number of columns.
  */
 ma.plugin.table.prototype.getColumnCount = function() {
@@ -757,7 +739,7 @@ ma.plugin.table.prototype.getColumnCount = function() {
 
 
 /**
- * SRC:_Web.js
+ * SRC:_tableCommon.js
  * @constructor
  * @param {object} columnName the name.
  */

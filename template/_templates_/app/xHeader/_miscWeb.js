@@ -53,19 +53,6 @@ App.prototype.svrCall = function(callBack, qdstr) {
   goog.net.XhrIo.send('./cgi-bin/server.pl', callBack, 'POST', qdstr);
 };
 
-/**
- * @constructor
- */
-goog.provide('PageHelper');
-PageHelper = function(){
-  
-}
-goog.inherits (PageHelper, goog.Disposable);
-
-PageHelper.prototype.init = function(pageId) {
-  this.eh1 = new goog.events.EventHandler();
-}
-
 
 
 

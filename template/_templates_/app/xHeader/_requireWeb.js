@@ -26,5 +26,6 @@ goog.require('goog.string');
 goog.require('goog.userAgent');
 goog.require('soy');
 goog.require('soydata');
+goog.require('PageHelper');
 
 

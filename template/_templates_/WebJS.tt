@@ -1,6 +1,7 @@
 [%- FILTER redirect('/app.js') -%]
 [%- serverErrorMsg_Communication ='Sorry, there was a problem communicating with the server.' -%]
 'use strict';
+//Generated: [%genDate%]
 [% # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -%]
 [%INCLUDE app/xHeader/_requireWeb.js%]
 [%INCLUDE app/xHeader/_globalWeb.js%]

@@ -1,9 +1,11 @@
 [%- FILTER redirect("/index.html") -%]
 <!DOCType html>
+<!--Generated: [%genDate%] -->
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 [%INCLUDE app/xHeader/_headerWeb.html%]
 <body> 
 [%-INCLUDE app/xFooter/_footerWeb.html-%]
+<p>Generated: [%genDate%]</p>
 </body>
 </html>
 [%- END #filter -%]

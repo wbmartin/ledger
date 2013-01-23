@@ -91,7 +91,6 @@ App.prototype.[% f %] = function(session_) {
 /**
  *[% f ='extendSession' %]
  * SRC: [% SRC_LOC %]
- * @param {string} session_ the session string.
  */
 App.prototype.[% f %] = function() {
   app.initSession(
@@ -101,7 +100,8 @@ App.prototype.[% f %] = function() {
 /**
  *[% f ='initSession' %]
  * SRC: [% SRC_LOC %]
- * @param {string} session_ the session string.
+ * @param {string} userId the user.
+ * @param {string} sessionId the session string.
  */
 App.prototype.[% f %] = function(userId, sessionId){
   var sessionExpirationSeconds = 60 * 20;
@@ -110,30 +110,18 @@ App.prototype.[% f %] = function(userId, sessionId){
   goog.net.cookies.set('user_id', userId, sessionExpirationSeconds);
 }
 
-/**
- *[% f ='addComponentToScreen' %]
- * SRC: [% SRC_LOC %]
- * @param {string} session_ the session string.
- */
-
-App.prototype.[% f %] = function(addTo, component){
-  var parentComponent = goog.dom.getElement(addTo);
-  goog.dom.appendChild(parentComponent, component);
-  //app.GLOBAL.onScreenComponents.push(component);
-};
 
 /**
  *[% f ='disposeOnScreenComponents' %]
  * SRC: [% SRC_LOC %]
- * @param {string} session_ the session string.
  */
-
+/*
 App.prototype.[% f %] = function(){
   var ndx = 0;
-  var onScreenCount = app.GLOBAL.onScreenComponents.length;
+  var onScreenCount = App.GLOBAL.onScreenComponents.length;
   var component;
   for(ndx = 0; ndx < onScreenCount; ndx++) {
-    component = app.GLOBAL.onScreenComponents.pop();
+    component = App.GLOBAL.onScreenComponents.pop();
     if (typeof component.dispose === 'function'){
       component.dispose();
     }
@@ -141,4 +129,5 @@ App.prototype.[% f %] = function(){
 
 
 };
+*/
 

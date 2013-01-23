@@ -4,6 +4,10 @@
 goog.provide('[%divId%]Web');
 goog.require('MainLauncherWebView');
 
+/**
+ * @constructor
+ * @extends {PageHelper}
+ */
 [%divId%]Web = function(){
   this.logger_.setLevel(App.GLOBAL.LOG_LEVEL);
   this.init('[%divId%]');

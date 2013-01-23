@@ -2,17 +2,18 @@
 [%SRC_LOC="_" _ divId _ "Web.js"%]
 
 goog.provide('[%divId%]Web');
-goog.require('[%divId%]Web.view');
+goog.require('[%divId%]WebView');
 
 
 /**
  *
+ * SRC: [%SRC_LOC%]
  * @constructor
  */
 [%divId%]Web = function(){
-   this.logger_.setLevel(app.GLOBAL.LOG_LEVEL);
+   this.logger_.setLevel(App.GLOBAL.LOG_LEVEL);
   this.logger_.info('Initialized');
-  app.dispatch['[%divId%]'] = [%divId%]Web.show;
+  App.dispatch['[%divId%]'] = [%divId%]Web.show;
 
 }
 /**
@@ -50,7 +51,7 @@ goog.require('[%divId%]Web.view');
     name: 'A'
   }
   ];
-  app.setMainContent([%divId%]Web.view.getPrimary(null, null));
+  app.setMainContent([%divId%]WebView.getPrimary(null, null));
   var tbl = new ma.plugin.table();
   tbl.tableName = 'testskidoo';
   tbl.data = rows;

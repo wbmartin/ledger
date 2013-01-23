@@ -1,4 +1,4 @@
-//[% SRC_LOC="_" _ divId _ "Web.js" %]
+//[% SRC_LOC="_tableCommon.js" %]
 goog.provide('ma.plugin.table');
 /**
  * SRC:[%SRC_LOC%]
@@ -80,7 +80,7 @@ ma.plugin.table.prototype.buildData = function() {
       else {
         if (typeof sortColumns[1] !== 'undefined' ){
           if (a[sortColumns[1]] < b[sortColumns[1]]) result = -1;
-          else if (a[sortColumns[1]] > b[sortColumn[1]]) result = 1; 
+          else if (a[sortColumns[1]] > b[sortColumns[1]]) result = 1; 
           else  result = 0;
         } else {
           result = 0;

@@ -4,6 +4,7 @@ goog.provide('LoginWeb');
 goog.require('LoginWebView');
 
 /**
+ * @extends {PageHelper}
  * @constructor
  */
 [%divId%]Web = function(){

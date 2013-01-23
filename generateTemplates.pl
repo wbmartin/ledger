@@ -10,6 +10,7 @@ Main:{
   my ($dbh, $key, $value, @templates,$templateName,  $outputPath, $tt, $var, %props, $key, $value,$templatePath);
   my %tables = ();
   my $absoluteSrcPath= $ARGV[0];
+  my $genDate = localtime;
   print "Recieved Path: $absoluteSrcPath\n";
   &DBGenUTIL::getProps(\%props, ("$absoluteSrcPath/template/include.properties"));
 $outputPath = "$absoluteSrcPath/template/_gen_";
@@ -19,7 +20,7 @@ $templatePath = "$absoluteSrcPath/template/_templates_/";
   &DBGenUTIL::getTables($dbh,\%tables);
 my @appTemplates ;
 &populateWebTemplates(\@appTemplates,"$absoluteSrcPath/template/_templates_/app");
-  $var = {tbl=>\%tables,props=>\%props, toCC=>\&DBGenUTIL::toCC, ucfirst =>\&DBGenUTIL::ucf, lcfirst =>\&DBGenUTIL::lcf, appTemplates=>\@appTemplates, getFileName =>\&DBGenUTIL::getFileName };
+  $var = {tbl=>\%tables,props=>\%props, toCC=>\&DBGenUTIL::toCC, ucfirst =>\&DBGenUTIL::ucf, lcfirst =>\&DBGenUTIL::lcf, appTemplates=>\@appTemplates, getFileName =>\&DBGenUTIL::getFileName, genDate=>$genDate };
   &DBGenUTIL::grabTemplates($templatePath, \@templates);
 print "\nif you're missing a table, be sure you've granted security.\n";
 print "\nTables: ";
