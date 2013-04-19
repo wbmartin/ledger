@@ -3,7 +3,7 @@
 
 goog.provide('[%divId%]Web');
 goog.require('[%divId%]WebView');
-
+goog.require('ma.plugin.table');
 
 /**
  *
@@ -25,10 +25,11 @@ goog.require('[%divId%]WebView');
 
 /**
  * SRC: [%SRC_LOC%]
+ * @extends {PageHelper}
  * @param {Object} args_ the args to pass to the show function.
  *
  */
-[%divId%]Web.prototype.show = function(args_) {
+[%divId%]Web = function(args_) {
   var rows = [
   {
     id: 0,
@@ -53,7 +54,6 @@ goog.require('[%divId%]WebView');
   ];
   app.setMainContent([%divId%]WebView.getPrimary(null, null));
   var tbl = new ma.plugin.table();
-  tbl.tableName = 'testskidoo';
   tbl.data = rows;
   tbl.addColumn(new ma.ColumnDef({name: 'id'}));
   tbl.addColumn(new ma.ColumnDef({name: 'name'}));
@@ -61,8 +61,23 @@ goog.require('[%divId%]WebView');
   tbl.sortOrder = 'ASC';
   tbl.idColumn = 'id';
   tbl.trIdPrefix = 'test';
-  tbl.construct();
+  tbl.decorate(goog.dom.getElement('testskidoo'));
 
 };
+
+goog.inherits([%divId%]Web, PageHelper);
+
+[%divId%]Web.prototype.disposeInternal = function(){
+  goog.dispose(this.eh1);
+}
+
+
+/**
+ * A reference to the  logger
+ * @type {goog.debug.Logger}
+ * @private
+ */
+[%divId%]Web.prototype.logger_ = goog.debug.Logger.getLogger('[%divId%]');
+App.dispatch['[%divId%]'] = function (){new [%divId%]Web();};
 
 

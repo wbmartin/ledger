@@ -41,13 +41,5 @@ goog.inherits([%divId%]Web, PageHelper);
 [%divId%]Web.prototype.logger_ = goog.debug.Logger.getLogger('[%divId%]');
 
 
-/**
- * SRC: [%SRC_LOC%]
- * @param {Object} args_ the args to pass to the show function.
- *
- */
-[%divId%]Web.prototype.show = function(args_) {
-
-};
 
 App.dispatch['[%divId%]'] = function (){new [%divId%]Web();};

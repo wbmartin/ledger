@@ -23,6 +23,7 @@
     <copy file="${templategen.dir}/webpages.js" todir="${build.dir}"/>
     <copy file="${template.dir}/app/xlib/soyutils_usegoog.js" todir="${build.dir}"/>
     <copy file="${template.dir}/app/xlib/pagehelper.js" todir="${build.dir}"/>
+    <copy file="${template.dir}/app/xlib/table.js" todir="${build.dir}"/>
   </target>
 
   <target name="build-soy">

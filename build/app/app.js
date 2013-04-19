@@ -1,5 +1,5 @@
 'use strict';
-//Generated: Tue Jan 22 23:55:46 2013
+//Generated: Wed Jan 23 21:21:05 2013
 /**
 *
 */
@@ -381,7 +381,7 @@ LoginWeb.prototype.attemptLogin = function() {
 
 goog.provide('tableWeb');
 goog.require('tableWebView');
-
+goog.require('ma.plugin.table');
 
 /**
  *
@@ -403,10 +403,11 @@ tableWeb.prototype.logger_ = goog.debug.Logger.getLogger('table');
 
 /**
  * SRC: _tableWeb.js
+ * @extends {PageHelper}
  * @param {Object} args_ the args to pass to the show function.
  *
  */
-tableWeb.prototype.show = function(args_) {
+tableWeb = function(args_) {
   var rows = [
   {
     id: 0,
@@ -431,7 +432,6 @@ tableWeb.prototype.show = function(args_) {
   ];
   app.setMainContent(tableWebView.getPrimary(null, null));
   var tbl = new ma.plugin.table();
-  tbl.tableName = 'testskidoo';
   tbl.data = rows;
   tbl.addColumn(new ma.ColumnDef({name: 'id'}));
   tbl.addColumn(new ma.ColumnDef({name: 'name'}));
@@ -439,9 +439,24 @@ tableWeb.prototype.show = function(args_) {
   tbl.sortOrder = 'ASC';
   tbl.idColumn = 'id';
   tbl.trIdPrefix = 'test';
-  tbl.construct();
+  tbl.decorate(goog.dom.getElement('testskidoo'));
 
 };
+
+goog.inherits(tableWeb, PageHelper);
+
+tableWeb.prototype.disposeInternal = function(){
+  goog.dispose(this.eh1);
+}
+
+
+/**
+ * A reference to the  logger
+ * @type {goog.debug.Logger}
+ * @private
+ */
+tableWeb.prototype.logger_ = goog.debug.Logger.getLogger('table');
+App.dispatch['table'] = function (){new tableWeb();};
 
 
 
@@ -517,14 +532,6 @@ MainLauncherWeb.prototype.disposeInternal = function(){
 MainLauncherWeb.prototype.logger_ = goog.debug.Logger.getLogger('MainLauncher');
 
 
-/**
- * SRC: _mainLauncherWeb.js
- * @param {Object} args_ the args to pass to the show function.
- *
- */
-MainLauncherWeb.prototype.show = function(args_) {
-
-};
 
 App.dispatch['MainLauncher'] = function (){new MainLauncherWeb();};
 
@@ -541,214 +548,6 @@ return val_;
 };
 
 
-//
-goog.provide('ma.plugin.table');
-/**
- * SRC:_tableCommon.js
- *
- * @constructor
- */
-ma.plugin.table = function() {
-  /** @type {string} */
-  this.tableName = 'defaultTableName';
-    this.columns = new Array();
-  this.data = new Array();
-  this.sortColumns = new Array();
-  this.sortOrder = 'ASC';
-  this.trIdPrefix = '';
-  this.tdIdPrefix = ''
-    this.idColumn = '';
-  this.tableName = 'defaultTableName';
-  this.trClass = '';
-
-};
-
-
-
-/**
- * SRC:_tableCommon.js
- */
-ma.plugin.table.prototype.construct = function() {
-  var tableOut = '<div id="' + this.tableName + 'DivId">';
-  tableOut +='<table id="' + this.tableName + 'TableId">';
-  tableOut += this.buildHeader();
-  tableOut += this.buildData();
-  tableOut += '</table>';
-  tableOut += '</div>';
-  goog.dom.getElement(this.tableName).innerHTML = tableOut;
-};
-
-/**
- * SRC:_tableCommon.js
- * @return {string} the table header.
- */
-ma.plugin.table.prototype.buildHeader = function() {
-  var header = '<thead>';
-  var columnLength = this.getColumnCount();
-  for (var i = 0; i < columnLength; i++) {
-    header += this.buildHeaderCell(i);
-  }
-  header += '</thead>';
-  return header;
-};
-
-/**
- * @param {number} columnId the column to display.
- * @return {string}
- */
-ma.plugin.table.prototype.buildHeaderCell = function (columnId){
-  var thcell='';
-  var tc = this.getColumn(columnId);
-  if (tc.visible){
-    thcell = '<th>' + tc.name + '</th>';
-  }
-  return thcell;
-}
-
-/**
- * SRC:_tableCommon.js
- * @return {string} the tablebody.
- */
-ma.plugin.table.prototype.buildData = function() {
-  var tbody = '<tbody>';
-  var rowLength = this.data.length;
-  var rowNdx;
-  var colNdx;
-  if (this.sortColumns.length > 0) {
-    var sortFunction = function (sortColumns, sortOrder, a,b) {
-      var result
-        var sortColumn1 = sortColumns[0];
-      if (a[sortColumns[0]] < b[sortColumns[0]]) result = -1;
-      else if (a[sortColumns[0]] > b[sortColumns[0]]) result = 1; 
-      else {
-        if (typeof sortColumns[1] !== 'undefined' ){
-          if (a[sortColumns[1]] < b[sortColumns[1]]) result = -1;
-          else if (a[sortColumns[1]] > b[sortColumns[1]]) result = 1; 
-          else  result = 0;
-        } else {
-          result = 0;
-        }
-      }
-      if (sortOrder === 'DESC') {result *= -1;}
-      return result;
-    };
-    goog.array.sort(this.data, goog.partial(
-          sortFunction,this.sortColumns, this.sortOrder));
-
-  }   
-
-  for (rowNdx = 0; rowNdx < rowLength; rowNdx++) {
-    tbody += this.buildRow(rowNdx);
-  }
-  tbody += '</tbody>';
-  return tbody;
-};
-
-/**
- * SRC:_tableCommon.js
- * @return {string} the table cell.
- * @param {Object} tr the table row.
- * @param {Object} tc the table column def.
- */
-ma.plugin.table.prototype.buildCell = function(tr, tcId) {
-  var tc = this.getColumn(tcId);
-  var cell ='';
-  if (tc.visible){
-    cell = '<td id ="td' + tc.name ;
-    cell += this.getRowId(tr) + '">';
-    cell += tr[tc.name] + '</td>';
-  }
-  return cell;
-};
-
-ma.plugin.table.prototype.buildRow = function(rowNdx){
-  var rowId;
-  var currentRow = this.getRow(rowNdx);
-  var rowStr = '';
-  var colLength = this.getColumnCount();
-  rowStr += '<tr id="' + this.getRowPrefix() + this.getRowId(currentRow, rowNdx);
-  rowStr +=  '" class="' + currentRow.trClass + '">';
-  for (var colNdx = 0; colNdx < colLength; colNdx++) {
-    rowStr += this.buildCell(currentRow,colNdx);
-  }
-  rowStr += '</tr>';
-  return rowStr;
-}
-
-ma.plugin.table.prototype.getRowId = function(row, rowNdx){
-  var rowId='';
-  if (this.idColumn !== '') {
-    rowId = row[this.idColumn];
-  } else {
-    rowId = rowNdx;
-  }
-  return rowId;
-}
-
-ma.plugin.table.prototype.getRowPrefix = function() {
-  var rowPrefix ='';
-  if (this.trIdPrefix !== '') { 
-    rowPrefix = this.trIdPrefix;
-  } else {
-    rowPrefix = 'defaultTrId';
-  }
-  return rowPrefix;
-}
-
-/**
- * SRC:_tableCommon.js
- * @param {ma.ColumnDef} newColumn the column definition.
- */
-ma.plugin.table.prototype.addColumn = function(newColumn) {
-  this.columns.push(newColumn);
-};
-/**
- * SRC:_tableCommon.js
- * @param {number} rowNumber the rownumber.
- * @return {Object} the data row.
- */
-ma.plugin.table.prototype.getRow = function(rowNumber) {
-  return this.data[rowNumber];
-};
-/**
- * SRC:_tableCommon.js
- * @return {number}  the number ofrows in the table.
- */
-ma.plugin.table.prototype.getRowCount = function() {
-  return this.data.length;
-};
-/**
- * SRC:_tableCommon.js
- * @param {number} colNumber the array index of the column number.
- * @return {ma.ColumnDef} the column Definition.
- */
-ma.plugin.table.prototype.getColumn = function(colNumber) {
-  return this.columns[colNumber];
-};
-/**
- * SRC:_tableCommon.js
- * @return {number} the number of columns.
- */
-ma.plugin.table.prototype.getColumnCount = function() {
-  return this.columns.length;
-};
-
-
-
-
-
-
-/**
- * SRC:_tableCommon.js
- * @constructor
- * @param {object} columnName the name.
- */
-ma.ColumnDef = function(options) {
-  /** @type {string} */
-  this.name = typeof options.name !== 'undefined' ? options.name :'defaultName';
-  /** @type {boolean} */
-  this.visible = typeof options.visible !== 'undefined' ? options.visible : true;
-};
 
 
 /**
